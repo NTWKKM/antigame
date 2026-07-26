@@ -1,40 +1,84 @@
 {
-  "ch1_intro": [
-    {
-      "speaker": "Elias",
-      "text": "The air in the Inner Ring is always 32K pristine... yet why does it taste like fake pixels?"
+  "dialogue": {
+    "ch1_intro_1": {
+      "speaker": "Vanguard",
+      "text": "Sector 7 Slums. A bit rot graveyard. Perfect place to hide a Golden Data Cube.",
+      "next": "ch1_intro_2"
     },
-    {
-      "speaker": "Retina Display UI",
-      "text": "CURRENT UX INDEX: 98.4 [TOP 0.1% TIER]. MAINTAIN PURITY TO PRESERVE HIGH-RES QUOTA."
+    "ch1_intro_2": {
+      "speaker": "Cipher Client",
+      "text": "[RADIO]: Remember, Vanguard. The Cube contains sensitive Archive logs. Do not let the Sweepers find it.",
+      "next": "ch1_intro_3"
     },
-    {
-      "speaker": "Elias",
-      "text": "Right. Keep your head down, keep your rendering smooth, and never look down at the slums."
+    "ch1_intro_3": {
+      "speaker": "Vanguard",
+      "text": "Just have my UX Index payout ready. I'm moving in.",
+      "action": "quest_advance",
+      "target": "2"
+    },
+
+    "ch2_silence_hour_1": {
+      "speaker": "Vesper",
+      "text": "Hold it, Mercenary. You're making too much noise in the low-poly zone.",
+      "next": "ch2_silence_hour_2"
+    },
+    "ch2_silence_hour_2": {
+      "speaker": "Vanguard",
+      "text": "An Eroded? What are you doing out here? The Glitch Fauna are restless.",
+      "next": "ch2_silence_hour_3"
+    },
+    "ch2_silence_hour_3": {
+      "speaker": "Vesper",
+      "text": "Looking for the same thing you are. But we have a bigger problem. The Archive is routing power to Substation 07.",
+      "action": "quest_advance",
+      "target": "3"
+    },
+
+    "ch5_foreign_ozone_1": {
+      "speaker": "Vanguard",
+      "text": "I smell ozone... and burning copper. The Substation is active.",
+      "next": "ch5_foreign_ozone_2"
+    },
+    "ch5_foreign_ozone_2": {
+      "speaker": "Vesper",
+      "text": "It's an Overclocked Maintenance Mech. They're trying to seal the blast doors! We have to destroy it!",
+      "next": "ch5_foreign_ozone_3"
+    },
+    "ch5_foreign_ozone_3": {
+      "speaker": "Vanguard",
+      "text": "Time to earn my pay. Let's scrap this rust bucket.",
+      "action": "start_battle",
+      "target": "boss_mech"
+    },
+
+    "ch5_transition": {
+      "speaker": "",
+      "text": "Enter Substation 07?",
+      "choices": [
+        {
+          "text": "Yes",
+          "action": "map_transition",
+          "target": "substation_07"
+        },
+        {
+          "text": "No"
+        }
+      ]
+    },
+
+    "substation_exit": {
+      "speaker": "",
+      "text": "Return to Sector 7 Slums?",
+      "choices": [
+        {
+          "text": "Yes",
+          "action": "map_transition",
+          "target": "sector_7_slums"
+        },
+        {
+          "text": "No"
+        }
+      ]
     }
-  ],
-  "ch2_silence_hour": [
-    {
-      "speaker": "System Announcement",
-      "text": "ATTENTION CITIZENS. THE SILENCE HOUR RITUAL HAS COMMENCED. HALT MOVEMENT."
-    },
-    {
-      "speaker": "Elias",
-      "text": "Every 15 minutes, the lighting resets and the scent of synthetic lavender repeats..."
-    }
-  ],
-  "ch5_foreign_ozone": [
-    {
-      "speaker": "Elias",
-      "text": "Wait... what is that smell? It's not lavender. It's... ozone? Burning copper?"
-    },
-    {
-      "speaker": "Retina Display UI",
-      "text": "WARNING: MINOR STUTTER DETECTED IN SECTOR 7 SUBSTATION. DOWN-SCALING ADVISORY."
-    },
-    {
-      "speaker": "Elias",
-      "text": "A frame drop in the Inner Ring? Impossible. I need to investigate."
-    }
-  ]
+  }
 }

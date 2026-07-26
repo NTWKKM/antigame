@@ -55,6 +55,9 @@ function NPCManager.load_map_npcs(map_name)
                 if obj.properties and obj.properties.run_once then
                     npc.run_once = true
                 end
+                if obj.properties and obj.properties.quest_step then
+                    npc.quest_step = obj.properties.quest_step
+                end
                 
                 table.insert(NPCManager.npcs, npc)
             end

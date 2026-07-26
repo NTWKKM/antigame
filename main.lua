@@ -40,7 +40,7 @@ function _init()
       GameState = {
           res = 100, -- Resolution (0-100)
           ux = 0,    -- UX Index (0-100)
-          party = {"elias"},
+          party = {"vanguard"},
           inventory = {},
           flags = {}
       }

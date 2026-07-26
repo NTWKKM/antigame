@@ -29,6 +29,16 @@
       "def": 5,
       "spd": 16,
       "skills": ["quick_strike"]
+    },
+    "boss_mech": {
+      "id": "boss_mech",
+      "name": "Corrupted Mech",
+      "hp": 350,
+      "max_hp": 350,
+      "atk": 25,
+      "def": 20,
+      "spd": 8,
+      "skills": ["heavy_swing", "overclock"]
     }
   },
   "encounters": [
@@ -43,6 +53,10 @@
     {
       "id": "ambush",
       "enemies": ["scout_01", "scout_01", "scout_01"]
+    },
+    {
+      "id": "boss_mech",
+      "enemies": ["boss_mech"]
     }
   ]
 }

@@ -37,12 +37,20 @@ end
 
 function DialogueBox.execute_action(action, target)
     if action == "start_battle" then
-        -- We'd set the encounter target in BattleManager before switching
-        State.switch("BATTLE")
+        State.switch("BATTLE", target)
     elseif action == "join_party" then
         print(target .. " joined the party!")
     elseif action == "ux_up_hide" then
         print("UX Index Increased!")
+    elseif action == "quest_advance" then
+        local target_chap = tonumber(target)
+        if target_chap and QuestTracker and QuestTracker.chapter < target_chap then
+            while QuestTracker.chapter < target_chap do
+                QuestTracker.advance_chapter()
+            end
+        end
+    elseif action == "map_transition" then
+        State.switch("EXPLORATION", target)
     end
 end
 

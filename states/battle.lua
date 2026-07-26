@@ -5,8 +5,33 @@ local Party = require("systems.party")
 local BattleState = {}
 
 function BattleState.enter(encounter_data)
+    local enemy_db = usagi.read_json("enemies.json")
+    if type(encounter_data) == "string" and enemy_db and enemy_db.encounters then
+        -- Find specific encounter by ID
+        local found = nil
+        for _, enc in ipairs(enemy_db.encounters) do
+            if enc.id == encounter_data then
+                found = enc
+                break
+            end
+        end
+        if found then
+            local active_enemies = {}
+            for _, enemy_id in ipairs(found.enemies) do
+                local template = enemy_db.enemies[enemy_id]
+                if template then
+                    local e = {}
+                    for k, v in pairs(template) do e[k] = v end
+                    table.insert(active_enemies, e)
+                end
+            end
+            encounter_data = { enemies = active_enemies }
+        else
+            encounter_data = nil
+        end
+    end
+
     if not encounter_data then
-        local enemy_db = usagi.read_json("enemies.json")
         if enemy_db and enemy_db.encounters and enemy_db.enemies then
             -- Select a random encounter
             local enc_def = enemy_db.encounters[math.random(1, #enemy_db.encounters)]

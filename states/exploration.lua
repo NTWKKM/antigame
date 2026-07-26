@@ -12,8 +12,8 @@ local ExplorationState = {
 }
 
 function ExplorationState.enter(map_name)
-    -- Default to sector 4 streets if no map provided
-    local target_map = map_name or "sector_4_streets"
+    -- Default to sector 7 slums if no map provided
+    local target_map = map_name or "sector_7_slums"
     
     Tilemap.init()
     Tilemap.load(target_map)
@@ -42,14 +42,16 @@ function ExplorationState.update(dt)
     -- Check walk-over triggers
     local trigger = NPCManager.check_trigger(Player.x, Player.y, Player.w, Player.h)
     if trigger then
-        if trigger.run_once then trigger.active = false end
-        -- Load dialogue tree from JSON
-        local dfile, dnode = trigger.dialogue_id:match("([^:]+):?([^:]*)")
-        dnode = (dnode == "") and dfile or dnode
-        if dfile and dfile ~= "" then
-            local data = usagi.read_json("dialogue/" .. dfile .. ".json")
-            if data and data.dialogue then
-                DialogueBox.start_tree(data.dialogue, dnode)
+        if not trigger.quest_step or (QuestTracker and QuestTracker.chapter == trigger.quest_step) then
+            if trigger.run_once then trigger.active = false end
+            -- Load dialogue tree from JSON
+            local dfile, dnode = trigger.dialogue_id:match("([^:]+):?([^:]*)")
+            dnode = (dnode == "") and dfile or dnode
+            if dfile and dfile ~= "" then
+                local data = usagi.read_json("dialogue/" .. dfile .. ".json")
+                if data and data.dialogue then
+                    DialogueBox.start_tree(data.dialogue, dnode)
+                end
             end
         end
     end

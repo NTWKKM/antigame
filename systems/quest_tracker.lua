@@ -9,26 +9,33 @@ local QuestTracker = {
 }
 
 local CHAPTER_NAMES = {
-    [1] = "Chapter 1: The Taste of Golden Pixels",
-    [2] = "Chapter 2: The Silence Hour Ritual",
-    [3] = "Chapter 3: The UX Index Paradox",
-    [4] = "Chapter 4: The Perfect Reflection",
-    [5] = "Chapter 5: The Smell of Foreign Ozone",
-    [6] = "Chapter 6: The Frame-Drop Second",
-    [7] = "Chapter 7: The Observers of Decay",
-    [8] = "Chapter 8: Logs of Lost Resolution",
-    [9] = "Chapter 9: Crack in the Mirror",
-    [10] = "Chapter 10: The Penalty of Imperfection",
-    [11] = "Chapter 11: Escaping the Inner Ring",
-    [12] = "Chapter 12: The Blurred Border",
-    [13] = "Chapter 13: The Fragment Market Shadow",
-    [14] = "Chapter 14: Operation of The Cipher",
-    [15] = "Chapter 15: The Deletion Sweep",
-    [16] = "Chapter 16: Distorted Memories",
-    [17] = "Chapter 17: The Shatter-Points",
-    [18] = "Chapter 18: The Genetics of Decay",
-    [19] = "Chapter 19: Pulse from the Abyss",
-    [20] = "Chapter 20: The Null Coordinate"
+    -- Act 1: The Sector 7 Job
+    [1] = "Chapter 1: The Sector 7 Bounty",
+    [2] = "Chapter 2: Slums and Scavengers",
+    [3] = "Chapter 3: Substation 07",
+    [4] = "Chapter 4: The Golden Data Cube",
+    [5] = "Chapter 5: Archive Alert",
+    
+    -- Act 2: The Fragment Market & Sunken Archives
+    [6] = "Chapter 6: Escape to the Mid-Sectors",
+    [7] = "Chapter 7: The Fragment Market",
+    [8] = "Chapter 8: Decrypting the Truth",
+    [9] = "Chapter 9: The Sunken Archives",
+    [10] = "Chapter 10: The Memory Eater",
+    
+    -- Act 3: Defense of the Mid-Sector
+    [11] = "Chapter 11: The Sweeper Raid",
+    [12] = "Chapter 12: Rallying The Eroded",
+    [13] = "Chapter 13: Syndicate Complex",
+    [14] = "Chapter 14: The Assembly Line",
+    [15] = "Chapter 15: Stand Your Ground",
+    
+    -- Act 4: Sabotaging the Node
+    [16] = "Chapter 16: The Desperate Plan",
+    [17] = "Chapter 17: Edge of the Dead Zone",
+    [18] = "Chapter 18: Infiltrating the Node",
+    [19] = "Chapter 19: The Node Custodian",
+    [20] = "Chapter 20: Disconnected"
 }
 
 function QuestTracker.init()

@@ -202,11 +202,33 @@ function Timeline.update(dt)
     elseif Timeline.state == "enemy_turn" then
         Timeline.enemy_timer = Timeline.enemy_timer - dt
         if Timeline.enemy_timer <= 0 then
-            local target = Timeline.get_random_target(false)
-            if target then
-                ReactiveDefense.start(target, "Strike", 1.0)
-                Timeline.state = "qte"
-                Timeline.target = target
+            local attacker = Timeline.active_combatant
+            local skill = "Strike"
+            if attacker.skills and #attacker.skills > 0 then
+                skill = attacker.skills[math.random(1, #attacker.skills)]
+            end
+
+            if skill == "overclock" then
+                for _, c in ipairs(Timeline.combatants) do
+                    if not c.is_enemy and c.state ~= "dead" then
+                        local dmg = math.floor(c.max_hp * 0.5)
+                        c:take_damage(dmg)
+                    end
+                end
+                sfx.play("hit")
+                Camera.shake(5, 0.5)
+                attacker:reset_atb()
+                Timeline.check_win_loss()
+                if Timeline.state == "enemy_turn" then
+                    Timeline.state = "active"
+                end
+            else
+                local target = Timeline.get_random_target(false)
+                if target then
+                    ReactiveDefense.start(target, skill, 1.0)
+                    Timeline.state = "qte"
+                    Timeline.target = target
+                end
             end
         end
     elseif Timeline.state == "qte" then
