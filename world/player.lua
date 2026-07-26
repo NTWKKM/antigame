@@ -1,5 +1,6 @@
 -- world/player.lua
 local Tilemap = require("world.tilemap")
+local FX = require("lib.fx")
 
 local Player = {
     x = 16,
@@ -9,7 +10,9 @@ local Player = {
     speed = 60,
     sprite_id = 2,
     facing = "down",
-    is_moving = false
+    is_moving = false,
+    anim_timer = 0,
+    frame = 0
 }
 
 function Player.init(start_x, start_y)
@@ -86,19 +89,28 @@ function Player.update(dt)
     end
 
     -- NOTE: Interaction handled in exploration state to avoid double-fire
+
+    if Player.is_moving then
+        Player.anim_timer = Player.anim_timer + dt
+        if Player.anim_timer > 0.15 then
+            Player.anim_timer = 0
+            Player.frame = Player.frame + 1
+            FX.spawn("dust", Player.x + 8, Player.y + 16, 0.5, 0)
+        end
+    end
 end
 
 function Player.draw()
     -- Draw shadow
     gfx.rect_fill(Player.x - (Camera.ox or 0) + 2, Player.y - (Camera.oy or 0) + 12, 12, 4, gfx.COLOR_BLACK)
     
-    -- Draw sprite (bobbing if moving)
-    local bob_offset = 0
+    -- Draw sprite (frame cycle if moving)
+    local draw_sprite = Player.sprite_id
     if Player.is_moving then
-        bob_offset = math.sin(usagi.elapsed * 15) * 2
+        draw_sprite = Player.sprite_id + (Player.frame % 2)
     end
     
-    gfx.spr(Player.sprite_id, Player.x - (Camera.ox or 0), Player.y - (Camera.oy or 0) + bob_offset)
+    gfx.spr(draw_sprite, Player.x - (Camera.ox or 0), Player.y - (Camera.oy or 0))
 end
 
 return Player

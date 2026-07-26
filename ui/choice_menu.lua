@@ -10,6 +10,8 @@ function choice_menu.show(choices, callback)
     choice_menu.callback = callback
     choice_menu.selected = 1
     choice_menu.active = true
+    choice_menu.scale = 0
+    Tween.to(choice_menu, 0.15, {scale = 1}, Tween.easeOutBack)
 end
 
 function choice_menu.update(dt)
@@ -33,21 +35,26 @@ end
 function choice_menu.draw()
     if not choice_menu.active then return end
     
-    local w = 160
-    local h = #choice_menu.choices * 12 + 8
-    local x = (320 - w) / 2
-    local y = (180 - h) / 2
+    local scale = choice_menu.scale or 1
+    if scale < 0.05 then return end
+    
+    local base_w = 160
+    local base_h = #choice_menu.choices * 12 + 8
+    local w = base_w * scale
+    local h = base_h * scale
+    local x = (usagi.GAME_W - w) / 2
+    local y = (usagi.GAME_H - h) / 2
     
     gfx.rect_fill(x, y, w, h, gfx.COLOR_BLACK)
     gfx.rect(x, y, w, h, gfx.COLOR_WHITE)
     
     for i, choice in ipairs(choice_menu.choices) do
-        local cy = y + 4 + (i - 1) * 12
+        local cy = y + (4 + (i - 1) * 12) * scale
         if i == choice_menu.selected then
-            gfx.text(">", x + 4, cy, gfx.COLOR_YELLOW)
-            gfx.text(choice.text, x + 16, cy, gfx.COLOR_YELLOW)
+            gfx.text_ex(">", x + 4 * scale, cy, scale, 0, gfx.COLOR_YELLOW, 1)
+            gfx.text_ex(choice.text, x + 16 * scale, cy, scale, 0, gfx.COLOR_YELLOW, 1)
         else
-            gfx.text(choice.text, x + 16, cy, gfx.COLOR_WHITE)
+            gfx.text_ex(choice.text, x + 16 * scale, cy, scale, 0, gfx.COLOR_WHITE, 1)
         end
     end
 end

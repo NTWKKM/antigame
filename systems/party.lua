@@ -10,9 +10,9 @@ local Party = {
 
 function Party.init()
     Party.members = {
-        vanguard = {
-            id = "vanguard",
-            name = "Vanguard",
+        elias = {
+            id = "elias",
+            name = "Elias",
             hp = 110, max_hp = 110, tp = 25, max_tp = 25,
             atk = 16, def = 12, spd = 11,
             fragments = {}, -- Equipped Core Fragments
@@ -40,7 +40,7 @@ function Party.init()
     if GameState and GameState.party then
         Party.active_party = GameState.party
     else
-        Party.active_party = {"vanguard"}
+        Party.active_party = {"elias"}
     end
 end
 

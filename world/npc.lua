@@ -1,5 +1,6 @@
 -- world/npc.lua
 local Tilemap = require("world.tilemap")
+local Player = require("world.player")
 
 local NPC = {}
 NPC.__index = NPC
@@ -15,11 +16,21 @@ function NPC.new(id, name, x, y, sprite_id, dialogue_id)
     self.sprite_id = sprite_id
     self.dialogue_id = dialogue_id
     self.active = true
+    self.wander_timer = math.random(2, 5)
+    self.show_prompt = false
     return self
 end
 
 function NPC:update(dt)
-    -- NPCs could wander here
+    if self.is_trigger or not self.active then return end
+    self.wander_timer = self.wander_timer - dt
+    if self.wander_timer <= 0 then
+        local dx = math.random(-1, 1)
+        local dy = math.random(-1, 1)
+        self.x = self.x + dx * dt * 20
+        self.y = self.y + dy * dt * 20
+        self.wander_timer = math.random(2, 5)
+    end
 end
 
 function NPC:draw()
@@ -28,6 +39,9 @@ function NPC:draw()
     gfx.rect_fill(self.x - (Camera.ox or 0) + 2, self.y - (Camera.oy or 0) + 12, 12, 4, gfx.COLOR_BLACK)
     -- Draw sprite
     gfx.spr(self.sprite_id, self.x - (Camera.ox or 0), self.y - (Camera.oy or 0))
+    if self.show_prompt then
+        gfx.text("!", self.x - (Camera.ox or 0), self.y - (Camera.oy or 0) - 10, gfx.COLOR_YELLOW)
+    end
 end
 
 -- NPC Manager
@@ -68,6 +82,10 @@ end
 function NPCManager.update(dt)
     for _, npc in ipairs(NPCManager.npcs) do
         npc:update(dt)
+        if not npc.is_trigger and npc.active then
+            local dist = math.abs(npc.x - Player.x) + math.abs(npc.y - Player.y)
+            npc.show_prompt = (dist < 24)
+        end
     end
 end
 

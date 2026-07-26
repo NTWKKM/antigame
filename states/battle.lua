@@ -3,13 +3,17 @@ local Timeline = require("battle.timeline")
 local Party = require("systems.party")
 
 local BattleState = {}
+local VictoryScreen = require("battle.victory_screen")
+local Inventory = require("systems.inventory")
 
 function BattleState.enter(encounter_data)
-    local enemy_db = usagi.read_json("enemies.json")
-    if type(encounter_data) == "string" and enemy_db and enemy_db.encounters then
+    local enemy_db = usagi.read_json("data/enemies/arc1_enemies.json") or usagi.read_json("enemies/arc1_enemies.json")
+    local encounter_db = usagi.read_json("data/encounters/arc1_encounters.json") or usagi.read_json("encounters/arc1_encounters.json")
+    
+    if type(encounter_data) == "string" and encounter_db and encounter_db.encounters then
         -- Find specific encounter by ID
         local found = nil
-        for _, enc in ipairs(enemy_db.encounters) do
+        for _, enc in ipairs(encounter_db.encounters) do
             if enc.id == encounter_data then
                 found = enc
                 break
@@ -25,16 +29,16 @@ function BattleState.enter(encounter_data)
                     table.insert(active_enemies, e)
                 end
             end
-            encounter_data = { enemies = active_enemies }
+            encounter_data = { enemies = active_enemies, music = found.music }
         else
             encounter_data = nil
         end
     end
 
     if not encounter_data then
-        if enemy_db and enemy_db.encounters and enemy_db.enemies then
+        if encounter_db and encounter_db.encounters and enemy_db and enemy_db.enemies then
             -- Select a random encounter
-            local enc_def = enemy_db.encounters[math.random(1, #enemy_db.encounters)]
+            local enc_def = encounter_db.encounters[math.random(1, #encounter_db.encounters)]
             local active_enemies = {}
             for _, enemy_id in ipairs(enc_def.enemies) do
                 local template = enemy_db.enemies[enemy_id]
@@ -45,7 +49,7 @@ function BattleState.enter(encounter_data)
                     table.insert(active_enemies, e)
                 end
             end
-            encounter_data = { enemies = active_enemies }
+            encounter_data = { enemies = active_enemies, music = enc_def.music }
         else
             encounter_data = {
                 enemies = {
@@ -60,15 +64,33 @@ function BattleState.enter(encounter_data)
     Timeline.init(party_data, encounter_data.enemies)
     
     -- Play battle music (file stem only, loop)
-    music.loop("theme")
+    if encounter_data and encounter_data.music then
+        music.loop(encounter_data.music)
+    else
+        music.loop("theme")
+    end
+    
+    VictoryScreen.init()
 end
 
 function BattleState.update(dt)
     Timeline.update(dt)
     
-    -- If win/loss and user presses BTN1, return to exploration
-    if (Timeline.state == "win" or Timeline.state == "lose") and input.pressed(input.BTN1) then
-        State.switch("EXPLORATION")
+    if Timeline.state == "win" then
+        if VictoryScreen.state == "inactive" then
+            VictoryScreen.start(Timeline.combatants)
+        end
+        if VictoryScreen.update(dt) then
+            for _, item in ipairs(VictoryScreen.items_dropped) do
+                Inventory.add_item(item, 1)
+            end
+            Inventory.add_currency(VictoryScreen.cubes_earned)
+            State.switch("EXPLORATION")
+        end
+    elseif Timeline.state == "lose" then
+        if input.pressed(input.BTN1) then
+            State.switch("EXPLORATION")
+        end
     end
 end
 
@@ -77,6 +99,14 @@ function BattleState.draw(dt)
     gfx.clear(gfx.COLOR_BLUE)
     
     Timeline.draw(dt)
+    
+    if Timeline.state == "win" then
+        VictoryScreen.draw()
+    elseif Timeline.state == "lose" then
+        gfx.rect_fill(0, 0, usagi.GAME_W, usagi.GAME_H, gfx.COLOR_BLACK, 0.8)
+        gfx.text_ex("GAME OVER", usagi.GAME_W / 2 - 40, usagi.GAME_H / 2 - 10, 2, 0, gfx.COLOR_RED, 1)
+        gfx.text("Press [Z] to exit", usagi.GAME_W / 2 - 40, usagi.GAME_H / 2 + 20, gfx.COLOR_WHITE)
+    end
 end
 
 function BattleState.draw_ui(dt)

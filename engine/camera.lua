@@ -7,7 +7,10 @@ local Camera = {
     shake_amount = 0,
     shake_duration = 0,
     bounds = { x1 = 0, y1 = 0, x2 = 1000, y2 = 1000 },
-    deadzone = { w = 32, h = 32 }
+    deadzone = { w = 32, h = 32 },
+    flash_color = nil,
+    flash_duration = 0,
+    hitstop_frames = 0
 }
 
 function Camera.init()
@@ -17,6 +20,8 @@ function Camera.init()
     Camera.target_y = 0
     Camera.shake_amount = 0
     Camera.shake_duration = 0
+    Camera.flash_duration = 0
+    Camera.hitstop_frames = 0
 end
 
 function Camera.follow(tx, ty)
@@ -36,10 +41,58 @@ function Camera.shake(amount, duration)
     Camera.shake_duration = duration
 end
 
+function Camera.flash(color, duration)
+    Camera.flash_color = color
+    Camera.flash_duration = duration
+end
+
+function Camera.draw_flash()
+    if Camera.flash_duration > 0 and Camera.flash_color then
+        gfx.rect_fill(0, 0, usagi.GAME_W, usagi.GAME_H, Camera.flash_color)
+    end
+end
+
+function Camera.hitstop(frames)
+    Camera.hitstop_frames = frames
+end
+
+function Camera.is_frozen()
+    return Camera.hitstop_frames > 0
+end
+
 function Camera.update(dt)
-    -- Calculate target camera position (centered on target)
-    local ideal_x = Camera.target_x - usagi.GAME_W / 2
-    local ideal_y = Camera.target_y - usagi.GAME_H / 2
+    if Camera.hitstop_frames > 0 then
+        Camera.hitstop_frames = Camera.hitstop_frames - 1
+        return
+    end
+
+    if Camera.flash_duration > 0 then
+        Camera.flash_duration = Camera.flash_duration - dt
+    end
+
+    -- Deadzone logic for target camera position
+    local target_screen_x = Camera.target_x - Camera.x
+    local target_screen_y = Camera.target_y - Camera.y
+    
+    local dz_left = (usagi.GAME_W - Camera.deadzone.w) / 2
+    local dz_right = dz_left + Camera.deadzone.w
+    local dz_top = (usagi.GAME_H - Camera.deadzone.h) / 2
+    local dz_bottom = dz_top + Camera.deadzone.h
+    
+    local ideal_x = Camera.x
+    local ideal_y = Camera.y
+    
+    if target_screen_x < dz_left then
+        ideal_x = Camera.target_x - dz_left
+    elseif target_screen_x > dz_right then
+        ideal_x = Camera.target_x - dz_right
+    end
+    
+    if target_screen_y < dz_top then
+        ideal_y = Camera.target_y - dz_top
+    elseif target_screen_y > dz_bottom then
+        ideal_y = Camera.target_y - dz_bottom
+    end
     
     -- Smooth approach (lerp)
     if util and util.approach then

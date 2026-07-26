@@ -17,7 +17,28 @@ function DialogueBox.start_tree(tree, node_id, on_complete)
     DialogueBox.tree = tree
     DialogueBox.on_complete = on_complete
     DialogueBox.active = true
+    DialogueBox.y_offset = 50
+    Tween.to(DialogueBox, 0.3, {y_offset = 0}, Tween.easeOutQuad)
     DialogueBox.load_node(node_id)
+end
+
+function DialogueBox.wrap_text(str, limit)
+    local lines = {}
+    local current_line = ""
+    for word in str:gmatch("%S+") do
+        if #current_line + #word + 1 > limit then
+            table.insert(lines, current_line)
+            current_line = word
+        else
+            if #current_line > 0 then
+                current_line = current_line .. " " .. word
+            else
+                current_line = word
+            end
+        end
+    end
+    if #current_line > 0 then table.insert(lines, current_line) end
+    return table.concat(lines, "\n")
 end
 
 function DialogueBox.load_node(node_id)
@@ -28,7 +49,8 @@ function DialogueBox.load_node(node_id)
     end
     
     DialogueBox.current_node = DialogueBox.tree[node_id]
-    DialogueBox.text = DialogueBox.current_node.text or ""
+    local raw_text = DialogueBox.current_node.text or ""
+    DialogueBox.text = DialogueBox.wrap_text(raw_text, 40)
     DialogueBox.speaker = DialogueBox.current_node.speaker or ""
     DialogueBox.display_text = ""
     DialogueBox.char_index = 0
@@ -39,9 +61,11 @@ function DialogueBox.execute_action(action, target)
     if action == "start_battle" then
         State.switch("BATTLE", target)
     elseif action == "join_party" then
-        print(target .. " joined the party!")
+        local Party = require("systems.party")
+        Party.add_member(target)
     elseif action == "ux_up_hide" then
-        print("UX Index Increased!")
+        local UXIndex = require("systems.ux_index")
+        UXIndex.add(10)
     elseif action == "quest_advance" then
         local target_chap = tonumber(target)
         if target_chap and QuestTracker and QuestTracker.chapter < target_chap then
@@ -115,7 +139,7 @@ function DialogueBox.draw()
     if not DialogueBox.active then return end
     
     local box_h = 45
-    local box_y = usagi.GAME_H - box_h - 8
+    local box_y = usagi.GAME_H - box_h - 8 + (DialogueBox.y_offset or 0)
     local box_w = usagi.GAME_W - 16
     local box_x = 8
     
@@ -130,7 +154,7 @@ function DialogueBox.draw()
     if DialogueBox.speaker ~= "" then
         -- Pick a color based on speaker
         local spk_color = gfx.COLOR_YELLOW -- default yellow
-        if DialogueBox.speaker == "Vanguard" then spk_color = gfx.COLOR_BLUE
+        if DialogueBox.speaker == "Elias" then spk_color = gfx.COLOR_BLUE
         elseif DialogueBox.speaker == "Vesper" then spk_color = gfx.COLOR_GREEN
         elseif DialogueBox.speaker == "Lyra" then spk_color = gfx.COLOR_PINK
         else spk_color = gfx.COLOR_RED end
@@ -149,6 +173,11 @@ function DialogueBox.draw()
         gfx.text(DialogueBox.display_text, box_x + 6, box_y + 11, gfx.COLOR_BLACK)
         -- Dialogue Text
         gfx.text(DialogueBox.display_text, box_x + 5, box_y + 10, gfx.COLOR_WHITE)
+    end
+    
+    if DialogueBox.char_index == #DialogueBox.text then
+        local bounce = math.sin(usagi.elapsed * 10) * 3
+        gfx.text("▼", box_x + box_w - 12, box_y + box_h - 12 + bounce, gfx.COLOR_YELLOW)
     end
     
     if ChoiceMenu.active then

@@ -12,9 +12,14 @@ Party = require("systems.party")
 ResolutionDecay = require("systems.resolution_decay")
 UXIndex = require("systems.ux_index")
 QuestTracker = require("systems.quest_tracker")
+SaveSystem = require("systems.save_system")
+
+FX = require("lib.fx")
+Tween = require("lib.tween")
+Transition = require("engine.transition")
 
 -- Require world components (stubs for now)
--- Player = require("world.player")
+Player = require("world.player")
 
 -- Global configuration
 function _config()
@@ -32,15 +37,12 @@ end
 -- Initialize game
 function _init()
   -- Load saved state if it exists
-  local saved_data = usagi.load()
-  if saved_data then
-      GameState = saved_data
-  else
+  if not SaveSystem.load() then
       -- Default new game state
       GameState = {
           res = 100, -- Resolution (0-100)
           ux = 0,    -- UX Index (0-100)
-          party = {"vanguard"},
+          party = {"elias"},
           inventory = {},
           flags = {}
       }
@@ -48,7 +50,7 @@ function _init()
 
   -- Register custom menu items if any
   usagi.menu_item("Save Game", function()
-    usagi.save(GameState)
+    SaveSystem.save()
   end)
   
   -- Initialize systems
@@ -58,9 +60,10 @@ function _init()
   UXIndex.init()
   QuestTracker.init()
   State.init()
+  FX.init()
   
   -- Start in EXPLORATION state for now
-  State.switch("EXPLORATION")
+  State.push("EXPLORATION")
   
   -- Give starting items for testing in dev mode
   if usagi and usagi.IS_DEV then
@@ -73,10 +76,14 @@ end
 
 -- Update loop
 function _update(dt)
+  if FX.should_freeze() then return end
   ResolutionDecay.update(dt)
   UXIndex.update(dt)
   State.update(dt)
   Camera.update(dt)
+  Tween.update(dt)
+  FX.update(dt)
+  Transition.update(dt)
 end
 
 
@@ -96,6 +103,8 @@ function _draw(dt)
   -- Draw current state (which will draw map, characters, etc.)
   State.draw(dt)
   
+  FX.draw_world()
+
   -- Detach camera for HUD and UI rendering
   Camera.detach()
   
@@ -104,4 +113,6 @@ function _draw(dt)
   
   -- Draw HUD and UI overlays
   State.draw_ui(dt)
+  FX.draw()
+  Transition.draw()
 end

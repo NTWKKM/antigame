@@ -36,6 +36,8 @@ function ReactiveDefense.update(dt)
         
         if input.pressed(input.BTN1) and not ReactiveDefense.resolved then
             ReactiveDefense.resolved = true
+            ReactiveDefense.result_scale = 2.0
+            Tween.to(ReactiveDefense, 0.3, {result_scale = 1.0}, Tween.easeOutQuad)
             
             -- Evaluate timing based on radius
             -- Perfect: wide window (r between 7 and 13, target is 10)
@@ -44,9 +46,13 @@ function ReactiveDefense.update(dt)
             if diff <= 3.0 then
                 ReactiveDefense.success_level = "perfect"
                 sfx.play("jump") -- ping sound for perfect
+                FX.spawn_particles(ReactiveDefense.target_combatant.draw_x + 8, ReactiveDefense.target_combatant.draw_y + 8, 12, gfx.COLOR_GREEN, 50, 0.4)
+                FX.screen_flash(gfx.COLOR_GREEN, 0.1)
+                FX.request_hitstop(4)
             elseif diff <= 6.0 then
                 ReactiveDefense.success_level = "good"
                 sfx.play("hit") -- duller sound for good
+                FX.request_hitstop(2)
             else
                 ReactiveDefense.success_level = "miss"
                 sfx.play("hurt")
@@ -57,6 +63,8 @@ function ReactiveDefense.update(dt)
             -- Failed to react
             ReactiveDefense.success_level = "miss"
             ReactiveDefense.resolved = true
+            ReactiveDefense.result_scale = 2.0
+            Tween.to(ReactiveDefense, 0.3, {result_scale = 1.0}, Tween.easeOutQuad)
         end
     else
         -- Small delay after resolve before hiding
@@ -84,16 +92,21 @@ function ReactiveDefense.draw()
     gfx.circ(tx, ty, ReactiveDefense.target_radius, gfx.COLOR_BLUE)
     
     if not ReactiveDefense.resolved then
-        -- Draw shrinking outer ring (white)
-        gfx.circ(tx, ty, math.max(1, math.floor(ReactiveDefense.current_radius)), gfx.COLOR_WHITE)
+            -- Draw shrinking outer ring
+            local progress = 1.0 - (ReactiveDefense.timer / ReactiveDefense.window)
+            local ring_color = gfx.COLOR_WHITE
+            if progress > 0.66 then ring_color = gfx.COLOR_RED
+            elseif progress > 0.33 then ring_color = gfx.COLOR_YELLOW end
+            gfx.circ(tx, ty, math.max(1, math.floor(ReactiveDefense.current_radius)), ring_color)
     else
         -- Draw feedback word
+        local scale = ReactiveDefense.result_scale or 1.0
         if ReactiveDefense.success_level == "perfect" then
-            gfx.text("PERFECT", tx - 15, ty - 20, gfx.COLOR_GREEN)
+            gfx.text_ex("PERFECT", tx - 15, ty - 20, scale, 0, gfx.COLOR_GREEN, 1.0)
         elseif ReactiveDefense.success_level == "good" then
-            gfx.text("GOOD", tx - 8, ty - 20, gfx.COLOR_YELLOW)
+            gfx.text_ex("GOOD", tx - 8, ty - 20, scale, 0, gfx.COLOR_YELLOW, 1.0)
         else
-            gfx.text("MISS", tx - 8, ty - 20, gfx.COLOR_RED)
+            gfx.text_ex("MISS", tx - 8, ty - 20, scale, 0, gfx.COLOR_RED, 1.0)
         end
     end
     

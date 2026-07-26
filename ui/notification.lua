@@ -2,12 +2,18 @@ local notification = {
     messages = {}
 }
 
-function notification.show(text, duration)
-    table.insert(notification.messages, {
+function notification.show(text, duration, color)
+    local msg = {
         text = text,
         timer = duration or 3.0,
-        y_offset = #notification.messages * 15
-    })
+        y_offset = #notification.messages * 15,
+        x_offset = 50,
+        color = color or gfx.COLOR_WHITE
+    }
+    table.insert(notification.messages, msg)
+    if Tween then
+        Tween.to(msg, 0.3, {x_offset = 0}, Tween.easeOutQuad)
+    end
 end
 
 function notification.update(dt)
@@ -22,12 +28,20 @@ end
 
 function notification.draw()
     for i, msg in ipairs(notification.messages) do
-        local alpha = math.min(1.0, msg.timer)
-        -- In Usagi, colors are indexed. For fading we might just not draw or dither.
-        -- We'll just skip drawing if it's dead.
+        local alpha = math.min(1.0, msg.timer / 0.3)
+        local exit_x = 0
+        if msg.timer < 0.3 then
+            exit_x = (1 - (msg.timer / 0.3)) * 50
+        end
+        local current_x = msg.x_offset + exit_x
         local y = 10 + (i - 1) * 15
-        gfx.rect_fill(320 - (#msg.text * 4) - 20, y - 2, (#msg.text * 4) + 10, 11, gfx.COLOR_BLACK)
-        gfx.text(msg.text, 320 - (#msg.text * 4) - 15, y, gfx.COLOR_WHITE)
+        
+        local w = #msg.text * 4
+        local bx = usagi.GAME_W - w - 20 + current_x
+        local tx = usagi.GAME_W - w - 15 + current_x
+        
+        gfx.rect_fill(bx, y - 2, w + 10, 11, gfx.COLOR_BLACK, alpha)
+        gfx.text(msg.text, tx, y, msg.color, alpha)
     end
 end
 

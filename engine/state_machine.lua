@@ -1,8 +1,7 @@
 -- engine/state_machine.lua
 local StateMachine = {
     states = {},
-    current_state_name = nil,
-    current_state = nil
+    stack = {}
 }
 
 function StateMachine.init()
@@ -15,40 +14,69 @@ function StateMachine.register(name, state_table)
     StateMachine.states[name] = state_table
 end
 
-function StateMachine.switch(name, ...)
+function StateMachine.swap(name, ...)
     local next_state = StateMachine.states[name]
     if not next_state then
         error("State '" .. tostring(name) .. "' not found!")
         return
     end
 
-    if StateMachine.current_state and StateMachine.current_state.exit then
-        StateMachine.current_state.exit()
+    local top = StateMachine.stack[#StateMachine.stack]
+    if top and top.exit then
+        top.exit()
+    end
+    
+    if #StateMachine.stack > 0 then
+        table.remove(StateMachine.stack)
+    end
+    table.insert(StateMachine.stack, next_state)
+
+    if next_state.enter then
+        next_state.enter(...)
+    end
+end
+
+function StateMachine.push(name, ...)
+    local next_state = StateMachine.states[name]
+    if not next_state then
+        error("State '" .. tostring(name) .. "' not found!")
+        return
     end
 
-    StateMachine.current_state_name = name
-    StateMachine.current_state = next_state
+    table.insert(StateMachine.stack, next_state)
+    if next_state.enter then
+        next_state.enter(...)
+    end
+end
 
-    if StateMachine.current_state.enter then
-        StateMachine.current_state.enter(...)
+function StateMachine.pop()
+    local top = StateMachine.stack[#StateMachine.stack]
+    if top then
+        if top.exit then
+            top.exit()
+        end
+        table.remove(StateMachine.stack)
     end
 end
 
 function StateMachine.update(dt)
-    if StateMachine.current_state and StateMachine.current_state.update then
-        StateMachine.current_state.update(dt)
+    local top = StateMachine.stack[#StateMachine.stack]
+    if top and top.update then
+        top.update(dt)
     end
 end
 
 function StateMachine.draw(dt)
-    if StateMachine.current_state and StateMachine.current_state.draw then
-        StateMachine.current_state.draw(dt)
+    local top = StateMachine.stack[#StateMachine.stack]
+    if top and top.draw then
+        top.draw(dt)
     end
 end
 
 function StateMachine.draw_ui(dt)
-    if StateMachine.current_state and StateMachine.current_state.draw_ui then
-        StateMachine.current_state.draw_ui(dt)
+    local top = StateMachine.stack[#StateMachine.stack]
+    if top and top.draw_ui then
+        top.draw_ui(dt)
     end
 end
 

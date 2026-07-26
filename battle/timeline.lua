@@ -22,6 +22,10 @@ function Timeline.init(party_data, enemy_data)
         local c = Combatant.new(p.id, p.name, false, p)
         c.x = 240
         c.y = 40 + (i * 30)
+        c.home_x = c.x
+        c.home_y = c.y
+        c.draw_x = c.x
+        c.draw_y = c.y
         table.insert(Timeline.combatants, c)
     end
     
@@ -29,6 +33,10 @@ function Timeline.init(party_data, enemy_data)
         local c = Combatant.new(e.id, e.name, true, e)
         c.x = 60
         c.y = 40 + (i * 30)
+        c.home_x = c.x
+        c.home_y = c.y
+        c.draw_x = c.x
+        c.draw_y = c.y
         table.insert(Timeline.combatants, c)
     end
     
@@ -39,6 +47,8 @@ function Timeline.init(party_data, enemy_data)
 end
 
 function Timeline.update(dt)
+    if FX.should_freeze() then return end
+    
     if Timeline.state == "active" then
         for _, c in ipairs(Timeline.combatants) do
             c:update_atb(dt)
@@ -50,6 +60,8 @@ function Timeline.update(dt)
                 else
                     Timeline.state = "player_turn"
                     Timeline.player_menu_cursor = 1
+                    Timeline.menu_scale = 0
+                    Tween.to(Timeline, 0.2, {menu_scale = 1}, Tween.easeOutBack)
                     sfx.play("select")
                 end
                 break
@@ -158,6 +170,11 @@ function Timeline.update(dt)
             end
             Actions.check_overheat(Timeline)
         end
+    elseif Timeline.state == "win" then
+        if not Timeline.win_popup_shown then
+            FX.text_popup(usagi.GAME_W/2, usagi.GAME_H/2, "VICTORY", gfx.COLOR_YELLOW, 2.0)
+            Timeline.win_popup_shown = true
+        end
     end
 end
 
@@ -188,41 +205,57 @@ function Timeline.check_overheat()
 end
 
 function Timeline.draw(dt)
+    -- Dark navy to dark purple gradient background
+    for i = 0, usagi.GAME_H, 2 do
+        local alpha = i / usagi.GAME_H
+        gfx.rect_fill(0, i, usagi.GAME_W, 2, gfx.COLOR_DARK_PURPLE, alpha)
+        gfx.rect_fill(0, i, usagi.GAME_W, 2, gfx.COLOR_DARK_BLUE, 1 - alpha)
+    end
+
     -- Draw Combatants
     for _, c in ipairs(Timeline.combatants) do
-        if c.state ~= "dead" then
+        if c:is_visible() then
             local spr_id = c.is_enemy and 5 or 2
+            local cx = c.draw_x + c.shake_x
+            local cy = c.draw_y + c.shake_y
+            
+            local alpha = 1.0
+            if c.state == "dead" and c.death_timer > 0 then
+                alpha = c.death_timer / 0.5
+            end
             
             if c.flash_timer and c.flash_timer > 0 then
                 if math.floor(c.flash_timer * 30) % 2 == 0 then
-                    gfx.rect_fill(c.x, c.y, 16, 16, gfx.COLOR_WHITE)
+                    gfx.rect_fill(cx, cy, 16, 16, gfx.COLOR_WHITE, alpha)
                 else
-                    gfx.spr(spr_id, c.x, c.y)
+                    gfx.spr(spr_id, cx, cy, alpha)
                 end
             else
-                gfx.spr(spr_id, c.x, c.y)
+                gfx.spr(spr_id, cx, cy, alpha)
             end
             
             local bar_w = 24
-            gfx.rect_fill(c.x - 2, c.y - 5, bar_w + 2, 5, gfx.COLOR_BLACK)
-            gfx.rect_fill(c.x - 2, c.y - 6, bar_w + 2, 5, gfx.COLOR_BLACK)
-            local hp_ratio = c.hp / c.max_hp
-            gfx.rect_fill(c.x - 1, c.y - 5, bar_w * hp_ratio, 3, c.is_enemy and gfx.COLOR_RED or gfx.COLOR_GREEN)
+            gfx.rect_fill(cx - 2, cy - 5, bar_w + 2, 5, gfx.COLOR_BLACK, alpha)
+            gfx.rect_fill(cx - 2, cy - 6, bar_w + 2, 5, gfx.COLOR_BLACK, alpha)
+            local hp_ratio = c.hp_display / c.max_hp
+            gfx.rect_fill(cx - 1, cy - 5, bar_w * hp_ratio, 3, c.is_enemy and gfx.COLOR_RED or gfx.COLOR_GREEN, alpha)
             
-            local p = c.atb / c.atb_max
-            gfx.rect_fill(c.x - 2, c.y + 19, bar_w + 2, 3, gfx.COLOR_BLACK)
-            gfx.rect_fill(c.x - 2, c.y + 18, bar_w + 2, 3, gfx.COLOR_BLACK)
-            gfx.rect_fill(c.x - 1, c.y + 19, bar_w * p, 1, gfx.COLOR_WHITE)
+            local p = c.atb_display / c.atb_max
+            gfx.rect_fill(cx - 2, cy + 19, bar_w + 2, 3, gfx.COLOR_BLACK, alpha)
+            gfx.rect_fill(cx - 2, cy + 18, bar_w + 2, 3, gfx.COLOR_BLACK, alpha)
+            gfx.rect_fill(cx - 1, cy + 19, bar_w * p, 1, gfx.COLOR_WHITE, alpha)
             
-            gfx.text(c.name, c.x + 1, c.y + 23, gfx.COLOR_BLACK)
-            gfx.text(c.name, c.x, c.y + 22, gfx.COLOR_WHITE)
+            gfx.text(c.name, cx + 1, cy + 23, gfx.COLOR_BLACK, alpha)
+            gfx.text(c.name, cx, cy + 22, gfx.COLOR_WHITE, alpha)
             
             if Timeline.active_combatant == c then
-                gfx.rect(c.x - 4, c.y - 8, 28, 32, gfx.COLOR_YELLOW)
-                gfx.rect(c.x - 5, c.y - 9, 30, 34, gfx.COLOR_ORANGE)
+                local glow_alpha = 0.3 + (math.sin(usagi.elapsed * 6) + 1) / 2 * 0.5
+                gfx.rect_fill(cx - 4, cy - 8, 28, 32, gfx.COLOR_YELLOW, glow_alpha)
             end
         end
     end
+    
+    FX.draw_world()
     
     local gauge_state = ResolutionGauge.get_state()
     local gauge_color = gfx.COLOR_WHITE
@@ -240,19 +273,29 @@ function Timeline.draw(dt)
     gfx.text("[" .. gauge_state .. "]", gauge_x, 14, gauge_color)
     
     if Timeline.state == "player_turn" then
-        local menu_x = usagi.GAME_W - 120
-        local menu_y = usagi.GAME_H - 60
-        gfx.rect_fill(menu_x + 2, menu_y + 2, 110, 50, gfx.COLOR_BLACK)
-        gfx.rect_fill(menu_x, menu_y, 110, 50, gfx.COLOR_BLACK)
-        gfx.rect(menu_x, menu_y, 110, 50, gfx.COLOR_LIGHT_GRAY)
+        local base_w, base_h = 110, 50
+        local scale = Timeline.menu_scale or 1
+        local w = base_w * scale
+        local h = base_h * scale
+        local menu_x = usagi.GAME_W - w - 10
+        local menu_y = usagi.GAME_H - h - 10
         
-        for i, opt in ipairs(Timeline.player_menu_options) do
-            local color = gfx.COLOR_WHITE
-            if i == Timeline.player_menu_cursor then color = gfx.COLOR_YELLOW end
-            gfx.text(opt, menu_x + 16, menu_y + 5 + (i * 8), gfx.COLOR_BLACK)
-            gfx.text(opt, menu_x + 15, menu_y + 4 + (i * 8), color)
-            if i == Timeline.player_menu_cursor then
-                gfx.text(">", menu_x + 5, menu_y + 4 + (i * 8), gfx.COLOR_YELLOW)
+        -- Optional: skip draw if scale is very small
+        if scale > 0.05 then
+            gfx.rect_fill(menu_x + 2, menu_y + 2, w, h, gfx.COLOR_BLACK)
+            gfx.rect_fill(menu_x, menu_y, w, h, gfx.COLOR_BLACK)
+            gfx.rect(menu_x, menu_y, w, h, gfx.COLOR_LIGHT_GRAY)
+            
+            local bounce = math.sin(usagi.elapsed * 10) * 2
+            
+            for i, opt in ipairs(Timeline.player_menu_options) do
+                local color = gfx.COLOR_WHITE
+                if i == Timeline.player_menu_cursor then color = gfx.COLOR_YELLOW end
+                gfx.text(opt, menu_x + 16, menu_y + 5 + (i * 8), gfx.COLOR_BLACK)
+                gfx.text(opt, menu_x + 15, menu_y + 4 + (i * 8), color)
+                if i == Timeline.player_menu_cursor then
+                    gfx.text(">", menu_x + 5 + bounce, menu_y + 4 + (i * 8), gfx.COLOR_YELLOW)
+                end
             end
         end
     elseif Timeline.state == "skills_menu" then
@@ -267,13 +310,14 @@ function Timeline.draw(dt)
         local skills = Timeline.active_combatant.skills or {}
         local mods = ResolutionGauge.get_modifiers()
         local cost = math.floor(10 * mods.cost)
+        local bounce = math.sin(usagi.elapsed * 10) * 2
         for i, opt in ipairs(skills) do
             local color = gfx.COLOR_WHITE
             if i == Timeline.skill_cursor then color = gfx.COLOR_YELLOW end
             gfx.text(opt .. " [" .. cost .. "TP]", menu_x + 16, menu_y + 16 + (i * 8), gfx.COLOR_BLACK)
             gfx.text(opt .. " [" .. cost .. "TP]", menu_x + 15, menu_y + 15 + (i * 8), color)
             if i == Timeline.skill_cursor then
-                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
+                gfx.text(">", menu_x + 5 + bounce, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
             end
         end
     elseif Timeline.state == "items_menu" then
@@ -285,6 +329,7 @@ function Timeline.draw(dt)
         gfx.text("ITEMS", menu_x + 31, menu_y + 6, gfx.COLOR_BLACK)
         gfx.text("ITEMS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
         
+        local bounce = math.sin(usagi.elapsed * 10) * 2
         for i, opt in ipairs(Timeline.item_list or {}) do
             local qty = Inventory.items[opt] or 0
             local color = gfx.COLOR_WHITE
@@ -292,7 +337,7 @@ function Timeline.draw(dt)
             gfx.text(opt .. " x" .. qty, menu_x + 16, menu_y + 16 + (i * 8), gfx.COLOR_BLACK)
             gfx.text(opt .. " x" .. qty, menu_x + 15, menu_y + 15 + (i * 8), color)
             if i == Timeline.item_cursor then
-                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
+                gfx.text(">", menu_x + 5 + bounce, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
             end
         end
     elseif Timeline.state == "sync_menu" then
@@ -304,13 +349,14 @@ function Timeline.draw(dt)
         gfx.text("SYNC TECHS", menu_x + 31, menu_y + 6, gfx.COLOR_BLACK)
         gfx.text("SYNC TECHS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
         
+        local bounce = math.sin(usagi.elapsed * 10) * 2
         for i, opt in ipairs(Timeline.sync_options) do
             local color = gfx.COLOR_WHITE
             if i == Timeline.sync_cursor then color = gfx.COLOR_YELLOW end
             gfx.text(opt.name, menu_x + 16, menu_y + 16 + (i * 8), gfx.COLOR_BLACK)
             gfx.text(opt.name, menu_x + 15, menu_y + 15 + (i * 8), color)
             if i == Timeline.sync_cursor then
-                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
+                gfx.text(">", menu_x + 5 + bounce, menu_y + 15 + (i * 8), gfx.COLOR_YELLOW)
             end
         end
     end

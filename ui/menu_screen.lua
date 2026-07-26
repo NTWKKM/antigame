@@ -11,7 +11,9 @@ local MenuScreen = {
     item_cursor = 1,
     frag_cursor = 1,
     selected_char = nil,
-    frag_list = {}
+    frag_list = {},
+    item_list = {},
+    scale = 1
 }
 
 function MenuScreen.toggle()
@@ -19,6 +21,17 @@ function MenuScreen.toggle()
     if MenuScreen.active then
         MenuScreen.state = "main"
         MenuScreen.cursor = 1
+        MenuScreen.scale = 0
+        Tween.to(MenuScreen, 0.2, {scale = 1}, Tween.easeOutBack)
+    end
+end
+
+function MenuScreen.build_item_list()
+    MenuScreen.item_list = {}
+    for id, qty in pairs(Inventory.items) do
+        if not CoreFragment.fragments[id] then
+            table.insert(MenuScreen.item_list, {id=id, qty=qty})
+        end
     end
 end
 
@@ -41,8 +54,30 @@ function MenuScreen.update(dt)
         end
         
     elseif MenuScreen.state == "items" then
-        -- We will implement a proper list later if needed, for now just view
-        if input.pressed(input.BTN2) then
+        local max_cursor = math.max(1, #MenuScreen.item_list)
+        if input.pressed(input.UP) then
+            MenuScreen.item_cursor = MenuScreen.item_cursor - 1
+            if MenuScreen.item_cursor < 1 then MenuScreen.item_cursor = max_cursor end
+            sfx.play("select")
+        elseif input.pressed(input.DOWN) then
+            MenuScreen.item_cursor = MenuScreen.item_cursor + 1
+            if MenuScreen.item_cursor > max_cursor then MenuScreen.item_cursor = 1 end
+            sfx.play("select")
+        elseif input.pressed(input.BTN1) and #MenuScreen.item_list > 0 then
+            local item = MenuScreen.item_list[MenuScreen.item_cursor]
+            if item.id == "medkit" then
+                for _, pid in ipairs(Party.active_party) do
+                    local member = Party.members[pid]
+                    if member.hp then
+                        member.hp = math.min(member.hp + 50, member.max_hp or member.hp + 50)
+                    end
+                end
+                Inventory.remove_item(item.id, 1)
+                sfx.play("heal")
+                MenuScreen.build_item_list()
+                if MenuScreen.item_cursor > #MenuScreen.item_list then MenuScreen.item_cursor = math.max(1, #MenuScreen.item_list) end
+            end
+        elseif input.pressed(input.BTN2) then
             MenuScreen.state = "main"
             sfx.play("jump")
         end
@@ -111,6 +146,8 @@ function MenuScreen.select_main()
         MenuScreen.toggle()
     elseif opt == "Items" then
         MenuScreen.state = "items"
+        MenuScreen.item_cursor = 1
+        MenuScreen.build_item_list()
     elseif opt == "Fragments" then
         MenuScreen.state = "fragments_char"
         MenuScreen.char_cursor = 1
@@ -124,13 +161,23 @@ end
 function MenuScreen.draw()
     if not MenuScreen.active then return end
     
-    local box_w = 200
-    local box_h = 140
+    local scale = MenuScreen.scale or 1
+    if scale < 0.05 then return end
+    
+    local base_w = 200
+    local base_h = 140
+    local box_w = base_w * scale
+    local box_h = base_h * scale
     local box_x = (usagi.GAME_W - box_w) / 2
     local box_y = (usagi.GAME_H - box_h) / 2
     
     gfx.rect_fill(box_x, box_y, box_w, box_h, gfx.COLOR_BLACK)
     gfx.rect(box_x, box_y, box_w, box_h, gfx.COLOR_WHITE)
+    
+    -- Only draw contents if fully scaled in to avoid text overflow when scaling,
+    -- or just draw normally relative to box_x and box_y.
+    -- For simplicity, we'll draw relative.
+    if scale < 0.9 then return end
     
     if MenuScreen.state == "main" then
         gfx.text("PAUSE", box_x + 80, box_y + 10, gfx.COLOR_YELLOW)
@@ -142,14 +189,40 @@ function MenuScreen.draw()
                 gfx.text(">", box_x + 70, box_y + 30 + (i * 12), gfx.COLOR_RED)
             end
         end
+        
+        local py = box_y + 30
+        for i, id in ipairs(Party.active_party) do
+            local c = Party.members[id]
+            gfx.text(c.name, box_x + 130, py, gfx.COLOR_WHITE)
+            gfx.text("HP: " .. (c.hp or 0) .. "/" .. (c.max_hp or 0), box_x + 130, py + 10, gfx.COLOR_GREEN)
+            gfx.text("TP: " .. (c.tp or 0) .. "/" .. (c.max_tp or 0), box_x + 130, py + 20, gfx.COLOR_BLUE)
+            py = py + 35
+        end
     elseif MenuScreen.state == "items" then
         gfx.text("INVENTORY", box_x + 70, box_y + 10, gfx.COLOR_YELLOW)
+        local max_vis = 8
+        local start_idx = math.max(1, MenuScreen.item_cursor - math.floor(max_vis/2))
+        local end_idx = math.min(#MenuScreen.item_list, start_idx + max_vis - 1)
+        if end_idx - start_idx + 1 < max_vis then
+            start_idx = math.max(1, end_idx - max_vis + 1)
+        end
+        
+        if start_idx > 1 then gfx.text("^", box_x + 95, box_y + 20, gfx.COLOR_WHITE) end
+        
         local y = box_y + 30
-        for id, qty in pairs(Inventory.items) do
-            if not CoreFragment.fragments[id] then
-                gfx.text(id .. " x" .. qty, box_x + 20, y, gfx.COLOR_WHITE)
-                y = y + 10
+        for i = start_idx, end_idx do
+            local item = MenuScreen.item_list[i]
+            local color = (i == MenuScreen.item_cursor) and gfx.COLOR_RED or gfx.COLOR_WHITE
+            gfx.text(item.id .. " x" .. item.qty, box_x + 20, y, color)
+            if i == MenuScreen.item_cursor then
+                gfx.text(">", box_x + 10, y, gfx.COLOR_RED)
             end
+            y = y + 10
+        end
+        
+        if end_idx < #MenuScreen.item_list then gfx.text("v", box_x + 95, y, gfx.COLOR_WHITE) end
+        if #MenuScreen.item_list == 0 then
+            gfx.text("No items in inventory", box_x + 20, box_y + 30, gfx.COLOR_RED)
         end
     elseif MenuScreen.state == "fragments_char" then
         gfx.text("SELECT CHARACTER", box_x + 50, box_y + 10, gfx.COLOR_YELLOW)
@@ -167,14 +240,30 @@ function MenuScreen.draw()
         end
     elseif MenuScreen.state == "fragments_list" then
         gfx.text("SELECT FRAGMENT", box_x + 50, box_y + 10, gfx.COLOR_YELLOW)
-        for i, fid in ipairs(MenuScreen.frag_list) do
+        
+        local max_vis = 6
+        local start_idx = math.max(1, MenuScreen.frag_cursor - math.floor(max_vis/2))
+        local end_idx = math.min(#MenuScreen.frag_list, start_idx + max_vis - 1)
+        if end_idx - start_idx + 1 < max_vis then
+            start_idx = math.max(1, end_idx - max_vis + 1)
+        end
+        
+        if start_idx > 1 then gfx.text("^", box_x + 95, box_y + 18, gfx.COLOR_WHITE) end
+        
+        local y = box_y + 25
+        for i = start_idx, end_idx do
+            local fid = MenuScreen.frag_list[i]
             local frag = CoreFragment.fragments[fid]
             local color = (i == MenuScreen.frag_cursor) and gfx.COLOR_RED or gfx.COLOR_WHITE
-            gfx.text(frag.name or fid, box_x + 30, box_y + 20 + (i * 15), color)
+            gfx.text(frag.name or fid, box_x + 30, y, color)
             if i == MenuScreen.frag_cursor then
-                gfx.text(">", box_x + 20, box_y + 20 + (i * 15), gfx.COLOR_RED)
+                gfx.text(">", box_x + 20, y, gfx.COLOR_RED)
             end
+            y = y + 15
         end
+        
+        if end_idx < #MenuScreen.frag_list then gfx.text("v", box_x + 95, y, gfx.COLOR_WHITE) end
+        
         if #MenuScreen.frag_list == 0 then
             gfx.text("No fragments in inventory", box_x + 20, box_y + 30, gfx.COLOR_RED)
         end

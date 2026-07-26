@@ -5,6 +5,7 @@ local NPCManager = require("world.npc")
 local HUD = require("ui.hud")
 local DialogueBox = require("ui.dialogue_box")
 local MenuScreen = require("ui.menu_screen")
+local Transition = require("engine.transition")
 
 local ExplorationState = {
     step_counter = 0,
@@ -82,7 +83,7 @@ function ExplorationState.update(dt)
             ExplorationState.step_counter = 0
             -- 30% chance of encounter per threshold
             if math.random() < 0.30 then
-                State.switch("BATTLE")
+                Transition.play("iris_out", 1.0, function() State.switch("BATTLE") end)
             end
         end
     end
@@ -96,9 +97,24 @@ function ExplorationState.draw(dt)
     -- Map layer
     Tilemap.draw()
     
-    -- Entity layer (sort by Y later, for now just draw NPCs then Player)
-    NPCManager.draw()
-    Player.draw()
+    -- Entity layer (sort by Y)
+    local entities = {}
+    table.insert(entities, {y = Player.y, obj = Player})
+    for _, npc in ipairs(NPCManager.npcs) do
+        if npc.active then
+            table.insert(entities, {y = npc.y, obj = npc})
+        end
+    end
+    
+    table.sort(entities, function(a, b) return a.y < b.y end)
+    
+    for _, entity in ipairs(entities) do
+        if entity.obj == Player then
+            Player.draw()
+        else
+            entity.obj:draw()
+        end
+    end
 end
 
 function ExplorationState.draw_ui(dt)

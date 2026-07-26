@@ -7,9 +7,22 @@ local Inventory = require("systems.inventory")
 local Actions = {}
 
 function Actions.execute_attack(Timeline, attacker, target, damage)
-    target:take_damage(damage)
+    local actual_damage = target:take_damage(damage)
     sfx.play("hit")
-    Camera.shake(2, 0.2)
+    
+    local color = actual_damage > 20 and gfx.COLOR_YELLOW or gfx.COLOR_WHITE
+    FX.damage_number(target.draw_x + 8, target.draw_y, actual_damage, color)
+    FX.screen_flash(gfx.COLOR_WHITE, 0.08)
+    FX.request_hitstop(3)
+    
+    local attacker_direction = attacker.is_enemy and -1 or 1
+    FX.spawn_impact(target.draw_x + 8, target.draw_y + 8, attacker_direction, 6, gfx.COLOR_WHITE)
+    
+    local target_x = attacker.home_x + attacker_direction * 20
+    Tween.sequence(attacker, {
+        {duration = 0.1, target = {draw_x = target_x}, easing = Tween.easeOutQuad},
+        {duration = 0.2, target = {draw_x = attacker.home_x}, easing = Tween.easeInOutQuad}
+    })
     
     attacker:reset_atb()
     Timeline.check_win_loss()
@@ -34,11 +47,15 @@ end
 function Actions.check_overheat(Timeline)
     if ResolutionGauge.value >= ResolutionGauge.max then
         sfx.play("hit")
-        Camera.shake(5, 0.5)
+        FX.screen_flash(gfx.COLOR_RED, 0.3)
+        FX.request_hitstop(6)
+        
         for _, c in ipairs(Timeline.combatants) do
             if not c.is_enemy and c.state ~= "dead" then
+                FX.spawn_glitch_particles(c.draw_x + 8, c.draw_y + 8, 10)
                 local dmg = math.floor(c.max_hp * 0.5)
-                c:take_damage(dmg)
+                local actual_dmg = c:take_damage(dmg)
+                FX.damage_number(c.draw_x + 8, c.draw_y, actual_dmg, gfx.COLOR_RED)
             end
         end
         ResolutionGauge.value = 0
@@ -65,6 +82,7 @@ function Actions.handle_player_menu(Timeline)
                 local mods = ResolutionGauge.get_modifiers()
                 local base_dmg = Timeline.active_combatant.atk
                 local final_dmg = math.floor(base_dmg * mods.dmg_out)
+                Camera.shake(3, 0.2)
                 Actions.execute_attack(Timeline, Timeline.active_combatant, target, final_dmg)
                 ResolutionGauge.apply_action(5)
                 Actions.check_overheat(Timeline)
@@ -128,7 +146,7 @@ function Actions.handle_enemy_turn(Timeline, dt)
                 end
             end
             sfx.play("hit")
-            Camera.shake(5, 0.5)
+            Camera.shake(6, 0.5)
             attacker:reset_atb()
             Timeline.check_win_loss()
             if Timeline.state == "enemy_turn" then
@@ -137,6 +155,7 @@ function Actions.handle_enemy_turn(Timeline, dt)
         else
             local target = Actions.get_random_target(Timeline, false)
             if target then
+                Camera.shake(2, 0.2)
                 ReactiveDefense.start(target, skill, 1.0)
                 Timeline.state = "qte"
                 Timeline.target = target

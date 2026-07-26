@@ -1,17 +1,17 @@
 {
   "dialogue": {
     "ch1_intro_1": {
-      "speaker": "Vanguard",
+      "speaker": "Elias",
       "text": "Sector 7 Slums. A bit rot graveyard. Perfect place to hide a Golden Data Cube.",
       "next": "ch1_intro_2"
     },
     "ch1_intro_2": {
       "speaker": "Cipher Client",
-      "text": "[RADIO]: Remember, Vanguard. The Cube contains sensitive Archive logs. Do not let the Sweepers find it.",
+      "text": "[RADIO]: Remember, Elias. The Cube contains sensitive Archive logs. Do not let the Sweepers find it.",
       "next": "ch1_intro_3"
     },
     "ch1_intro_3": {
-      "speaker": "Vanguard",
+      "speaker": "Elias",
       "text": "Just have my UX Index payout ready. I'm moving in.",
       "action": "quest_advance",
       "target": "2"
@@ -23,7 +23,7 @@
       "next": "ch2_silence_hour_2"
     },
     "ch2_silence_hour_2": {
-      "speaker": "Vanguard",
+      "speaker": "Elias",
       "text": "An Eroded? What are you doing out here? The Glitch Fauna are restless.",
       "next": "ch2_silence_hour_3"
     },
@@ -35,7 +35,7 @@
     },
 
     "ch5_foreign_ozone_1": {
-      "speaker": "Vanguard",
+      "speaker": "Elias",
       "text": "I smell ozone... and burning copper. The Substation is active.",
       "next": "ch5_foreign_ozone_2"
     },
@@ -45,7 +45,7 @@
       "next": "ch5_foreign_ozone_3"
     },
     "ch5_foreign_ozone_3": {
-      "speaker": "Vanguard",
+      "speaker": "Elias",
       "text": "Time to earn my pay. Let's scrap this rust bucket.",
       "action": "start_battle",
       "target": "boss_mech"
