@@ -9,6 +9,8 @@ function Combatant.new(id, name, is_enemy, stats)
     self.is_enemy = is_enemy
     self.hp = stats.hp or 100
     self.max_hp = stats.max_hp or 100
+    self.tp = stats.tp or 50
+    self.max_tp = stats.max_tp or 50
     self.atk = stats.atk or 10
     self.def = stats.def or 10
     self.spd = stats.spd or 10

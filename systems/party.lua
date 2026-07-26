@@ -92,9 +92,14 @@ function Party.get_active_stats()
 end
 
 function Party.update_member_status(id, hp, tp)
-    if Party.members[id] then
-        Party.members[id].hp = math.max(0, math.min(Party.members[id].max_hp, hp))
-        Party.members[id].tp = math.max(0, math.min(Party.members[id].max_tp, tp))
+    local m = Party.members[id]
+    if m then
+        if hp ~= nil and m.max_hp then
+            m.hp = math.max(0, math.min(m.max_hp, hp))
+        end
+        if tp ~= nil and m.max_tp then
+            m.tp = math.max(0, math.min(m.max_tp, tp))
+        end
     end
 end
 
