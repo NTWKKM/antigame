@@ -39,40 +39,43 @@ local CHAPTER_NAMES = {
 }
 
 function QuestTracker.init()
+    local ResolutionDecay = require("systems.resolution_decay")
     if GameState and GameState.quest then
         QuestTracker.chapter = GameState.quest.chapter or 1
         QuestTracker.phase = GameState.quest.phase or 1
-        QuestTracker.resolution_state = GameState.quest.resolution_state or "Pristine"
         QuestTracker.current_quest = CHAPTER_NAMES[QuestTracker.chapter] or CHAPTER_NAMES[1]
         QuestTracker.flags = GameState.quest.flags or {}
     else
         QuestTracker.chapter = 1
         QuestTracker.phase = 1
-        QuestTracker.resolution_state = "Pristine"
         QuestTracker.current_quest = CHAPTER_NAMES[1]
         QuestTracker.flags = {}
     end
+    QuestTracker.resolution_state = ResolutionDecay.get_resolution_state()
 end
 
 function QuestTracker.advance_chapter()
+    local ResolutionDecay = require("systems.resolution_decay")
     if QuestTracker.chapter < 20 then
         QuestTracker.chapter = QuestTracker.chapter + 1
         QuestTracker.current_quest = CHAPTER_NAMES[QuestTracker.chapter]
         
-        -- Update Phase and Resolution State based on chapter bounds
+        -- Update Phase based on chapter bounds
         if QuestTracker.chapter <= 5 then
             QuestTracker.phase = 1
-            QuestTracker.resolution_state = "Pristine"
+            GameState.current_zone_decay_rate = 0.0
         elseif QuestTracker.chapter <= 10 then
             QuestTracker.phase = 2
-            QuestTracker.resolution_state = "Degrading"
+            GameState.current_zone_decay_rate = 0.05
         elseif QuestTracker.chapter <= 15 then
             QuestTracker.phase = 3
-            QuestTracker.resolution_state = "Bit Rot"
+            GameState.current_zone_decay_rate = 0.15
         else
             QuestTracker.phase = 4
-            QuestTracker.resolution_state = "Dead Zone"
+            GameState.current_zone_decay_rate = 0.30
         end
+        
+        QuestTracker.resolution_state = ResolutionDecay.get_resolution_state()
         
         -- Sync to GameState
         if GameState then
@@ -99,15 +102,9 @@ function QuestTracker.has_flag(flag_name)
 end
 
 function QuestTracker.get_shader_intensity()
-    if QuestTracker.resolution_state == "Pristine" then
-        return 0.0
-    elseif QuestTracker.resolution_state == "Degrading" then
-        return 0.25
-    elseif QuestTracker.resolution_state == "Bit Rot" then
-        return 0.6
-    else
-        return 0.95 -- Dead Zone / Null Coordinate
-    end
+    local ResolutionDecay = require("systems.resolution_decay")
+    return ResolutionDecay.get_shader_intensity()
 end
 
 return QuestTracker
+

@@ -62,18 +62,23 @@ function _init()
   -- Start in EXPLORATION state for now
   State.switch("EXPLORATION")
   
-  -- Give starting items for testing
-  local Inventory = require("systems.inventory")
-  Inventory.add_item("medkit", 5)
-  Inventory.add_item("chrono_shard", 1)
-  Inventory.add_item("aegis_core", 1)
+  -- Give starting items for testing in dev mode
+  if usagi and usagi.IS_DEV then
+    local Inventory = require("systems.inventory")
+    Inventory.add_item("medkit", 5)
+    Inventory.add_item("chrono_shard", 1)
+    Inventory.add_item("aegis_core", 1)
+  end
 end
 
 -- Update loop
 function _update(dt)
+  ResolutionDecay.update(dt)
+  UXIndex.update(dt)
   State.update(dt)
   Camera.update(dt)
 end
+
 
 -- Draw loop
 function _draw(dt)
