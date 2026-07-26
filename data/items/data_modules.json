@@ -1,0 +1,22 @@
+{
+    "data_modules": {
+        "sprint_protocol": {
+            "id": "sprint_protocol",
+            "name": "Sprint Protocol",
+            "description": "Doubles exploration movement speed.",
+            "effect": "move_speed_x2"
+        },
+        "auto_barrier": {
+            "id": "auto_barrier",
+            "name": "Auto-Barrier",
+            "description": "Start battles with a DEF buff.",
+            "effect": "start_battle_def_up"
+        },
+        "noise_amplifier": {
+            "id": "noise_amplifier",
+            "name": "Noise Amplifier",
+            "description": "Increases UX Index gains.",
+            "effect": "ux_gain_up"
+        }
+    }
+}

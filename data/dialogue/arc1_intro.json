@@ -1,0 +1,35 @@
+{
+    "dialogue": {
+        "intro_scene_1": {
+            "speaker": "Elias",
+            "text": "The resolution is dropping again. I need to find a Quantum Mercury pool before I hollow out.",
+            "next": "intro_scene_2"
+        },
+        "intro_scene_2": {
+            "speaker": "System",
+            "text": "WARNING: Unauthorized sector breach detected. Dispatching Sweeper units.",
+            "next": "intro_scene_3"
+        },
+        "intro_scene_3": {
+            "speaker": "Elias",
+            "text": "Here they come.",
+            "choices": [
+                {
+                    "text": "[Prepare for combat]",
+                    "action": "start_battle",
+                    "target": "arc1_patrol_easy"
+                },
+                {
+                    "text": "[Attempt to hide] (Increases UX)",
+                    "action": "ux_up_hide",
+                    "next": "intro_scene_hide"
+                }
+            ]
+        },
+        "intro_scene_hide": {
+            "speaker": "Elias",
+            "text": "Not worth the RES drain... I'll take the alleys.",
+            "action": "end"
+        }
+    }
+}

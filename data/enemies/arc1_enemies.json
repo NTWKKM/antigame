@@ -1,0 +1,53 @@
+{
+    "enemies": {
+        "drone_sweeper": {
+            "id": "drone_sweeper",
+            "name": "Sweeper Drone",
+            "description": "A basic automated enforcement unit.",
+            "stats": {
+                "hp": 45,
+                "max_hp": 45,
+                "atk": 12,
+                "def": 8,
+                "spd": 10
+            },
+            "skills": ["shoot", "ping_scan"],
+            "drops": [
+                {"item": "data_cube", "chance": 0.8, "qty": 10}
+            ]
+        },
+        "drone_nullifier": {
+            "id": "drone_nullifier",
+            "name": "Nullifier Scout",
+            "description": "An agile drone designed to silence rogue signals.",
+            "stats": {
+                "hp": 35,
+                "max_hp": 35,
+                "atk": 15,
+                "def": 5,
+                "spd": 16
+            },
+            "skills": ["shoot", "silence_burst"],
+            "drops": [
+                {"item": "data_cube", "chance": 1.0, "qty": 15}
+            ]
+        },
+        "boss_sweeper_captain": {
+            "id": "boss_sweeper_captain",
+            "name": "Sweeper Captain",
+            "description": "An elite enforcement unit governing Sector 4.",
+            "stats": {
+                "hp": 300,
+                "max_hp": 300,
+                "atk": 22,
+                "def": 15,
+                "spd": 14
+            },
+            "skills": ["shoot", "heavy_laser", "reinforce"],
+            "drops": [
+                {"item": "core_frag_architect", "chance": 1.0, "qty": 1}
+            ],
+            "boss": true
+        }
+    }
+}

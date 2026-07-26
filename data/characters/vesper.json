@@ -1,0 +1,20 @@
+{
+    "id": "vesper",
+    "name": "Vesper",
+    "description": "A rogue data-weaver who manipulates the city's subsystems.",
+    "base_stats": {
+        "hp": 95,
+        "max_hp": 95,
+        "tp": 80,
+        "max_tp": 80,
+        "atk": 8,
+        "mag": 22,
+        "def": 8,
+        "mdef": 15,
+        "spd": 15,
+        "res": 100
+    },
+    "skills": ["memory_scan", "data_shield"],
+    "equipped_fragments": [],
+    "equipped_modules": []
+}

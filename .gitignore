@@ -1,0 +1,19 @@
+export/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Mac
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

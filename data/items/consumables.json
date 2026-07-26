@@ -1,0 +1,26 @@
+{
+    "items": {
+        "data_cube": {
+            "id": "data_cube",
+            "name": "Data Cube",
+            "description": "Standard currency and raw processing material.",
+            "type": "currency"
+        },
+        "clarity_drug": {
+            "id": "clarity_drug",
+            "name": "Clarity Drug",
+            "description": "Restores 20% Resolution but increases UX Index by 5.",
+            "type": "consumable",
+            "effect": "restore_res",
+            "amount": 20
+        },
+        "health_packet": {
+            "id": "health_packet",
+            "name": "Health Packet",
+            "description": "Restores 50 HP.",
+            "type": "consumable",
+            "effect": "restore_hp",
+            "amount": 50
+        }
+    }
+}

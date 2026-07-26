@@ -1,0 +1,31 @@
+{
+    "core_fragments": {
+        "architects_shard": {
+            "id": "architects_shard",
+            "name": "Architect's Shard",
+            "description": "A crystalline data core from a fallen sector architect.",
+            "stat_bonus": {
+                "max_tp": 10,
+                "mag": 2
+            },
+            "learnable_skills": {
+                "data_shield": 2,
+                "recompile": 1
+            },
+            "burst": "system_restore"
+        },
+        "vespers_memory": {
+            "id": "vespers_memory",
+            "name": "Vesper's Memory",
+            "description": "A fragmented memory block containing rogue weave-code.",
+            "stat_bonus": {
+                "spd": 3
+            },
+            "learnable_skills": {
+                "memory_scan": 5,
+                "glitch_step": 1
+            },
+            "burst": "silent_archive"
+        }
+    }
+}

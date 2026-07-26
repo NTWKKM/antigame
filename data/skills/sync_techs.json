@@ -1,0 +1,28 @@
+{
+    "sync_techs": {
+        "archive_breach": {
+            "id": "archive_breach",
+            "name": "Archive Breach",
+            "description": "Elias and Vesper combine a data lance with a memory overwrite.",
+            "req_chars": ["elias", "vesper"],
+            "req_tp": 30,
+            "power": 2.5,
+            "type": "sync",
+            "target": "single_enemy",
+            "res_impact": -5,
+            "gauge_impact": 10
+        },
+        "uncompressed_cascade": {
+            "id": "uncompressed_cascade",
+            "name": "Uncompressed Cascade",
+            "description": "Elias and Lyra dump raw resolution data over the battlefield.",
+            "req_chars": ["elias", "lyra"],
+            "req_tp": 50,
+            "power": 1.8,
+            "type": "sync",
+            "target": "all_enemies",
+            "res_impact": -15,
+            "gauge_impact": 15
+        }
+    }
+}

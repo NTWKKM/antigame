@@ -1,0 +1,59 @@
+-- battle/combatant.lua
+local Combatant = {}
+Combatant.__index = Combatant
+
+function Combatant.new(id, name, is_enemy, stats)
+    local self = setmetatable({}, Combatant)
+    self.id = id
+    self.name = name
+    self.is_enemy = is_enemy
+    self.hp = stats.hp or 100
+    self.max_hp = stats.max_hp or 100
+    self.atk = stats.atk or 10
+    self.def = stats.def or 10
+    self.spd = stats.spd or 10
+    self.skills = stats.skills or {}
+    
+    -- Battle state
+    self.atb = 0
+    self.atb_max = 1000
+    self.state = "idle" -- idle, ready, acting, dead
+    self.action_queue = nil
+    
+    return self
+end
+
+function Combatant:update_atb(dt)
+    if self.state == "dead" then return end
+    if self.state == "idle" then
+        -- Fill ATB based on speed
+        self.atb = self.atb + (self.spd * dt * 50)
+        if self.atb >= self.atb_max then
+            self.atb = self.atb_max
+            self.state = "ready"
+        end
+    end
+end
+
+function Combatant:take_damage(amount)
+    local actual_damage = math.max(1, amount - (self.def / 2))
+    self.hp = self.hp - actual_damage
+    if self.hp <= 0 then
+        self.hp = 0
+        self.state = "dead"
+        self.atb = 0
+    end
+    return actual_damage
+end
+
+function Combatant:heal(amount)
+    self.hp = self.hp + amount
+    if self.hp > self.max_hp then self.hp = self.max_hp end
+end
+
+function Combatant:reset_atb()
+    self.atb = 0
+    self.state = "idle"
+end
+
+return Combatant

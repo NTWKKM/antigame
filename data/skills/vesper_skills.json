@@ -1,0 +1,27 @@
+{
+    "skills": {
+        "memory_scan": {
+            "id": "memory_scan",
+            "name": "Memory Scan",
+            "description": "Analyzes an enemy, revealing stats and weaknesses.",
+            "tp_cost": 10,
+            "power": 0,
+            "type": "support",
+            "target": "single_enemy",
+            "res_impact": 0,
+            "gauge_impact": 2
+        },
+        "data_shield": {
+            "id": "data_shield",
+            "name": "Data Shield",
+            "description": "Provides a defensive barrier to one ally.",
+            "tp_cost": 25,
+            "power": 0,
+            "type": "support",
+            "target": "single_ally",
+            "res_impact": 0,
+            "gauge_impact": -5,
+            "status_effect": "barrier"
+        }
+    }
+}

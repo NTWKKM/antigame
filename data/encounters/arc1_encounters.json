@@ -1,0 +1,22 @@
+{
+    "encounters": {
+        "arc1_patrol_easy": {
+            "id": "arc1_patrol_easy",
+            "enemies": ["drone_sweeper"]
+        },
+        "arc1_patrol_med": {
+            "id": "arc1_patrol_med",
+            "enemies": ["drone_sweeper", "drone_sweeper"]
+        },
+        "arc1_patrol_hard": {
+            "id": "arc1_patrol_hard",
+            "enemies": ["drone_sweeper", "drone_nullifier"]
+        },
+        "boss_fight_01": {
+            "id": "boss_fight_01",
+            "enemies": ["boss_sweeper_captain"],
+            "music": "boss_theme",
+            "prevent_flee": true
+        }
+    }
+}

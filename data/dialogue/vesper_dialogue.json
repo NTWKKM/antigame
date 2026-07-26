@@ -1,0 +1,39 @@
+{
+    "dialogue": {
+        "vesper_meet_1": {
+            "speaker": "Vesper",
+            "text": "You're shedding packets everywhere, Enforcer. Your RES must be under 40%.",
+            "next": "vesper_meet_2"
+        },
+        "vesper_meet_2": {
+            "speaker": "Elias",
+            "text": "I didn't ask for a diagnostic. I need access to the lower routing layer.",
+            "next": "vesper_meet_3"
+        },
+        "vesper_meet_3": {
+            "speaker": "Vesper",
+            "text": "I can get you in. But it'll cost you. That Payload you're carrying?",
+            "choices": [
+                {
+                    "text": "Deal.",
+                    "next": "vesper_meet_deal"
+                },
+                {
+                    "text": "No deal. I'll find another way.",
+                    "next": "vesper_meet_reject"
+                }
+            ]
+        },
+        "vesper_meet_deal": {
+            "speaker": "Vesper",
+            "text": "Smart. Let's move before the Sweepers catch up.",
+            "action": "join_party",
+            "target": "vesper"
+        },
+        "vesper_meet_reject": {
+            "speaker": "Vesper",
+            "text": "Suit yourself. Enjoy the Bit Rot.",
+            "action": "end"
+        }
+    }
+}

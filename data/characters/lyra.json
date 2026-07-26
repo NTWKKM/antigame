@@ -1,0 +1,20 @@
+{
+    "id": "lyra",
+    "name": "Lyra",
+    "description": "An anomalous construct born from a glitch in the Quantum Mercury.",
+    "base_stats": {
+        "hp": 80,
+        "max_hp": 80,
+        "tp": 100,
+        "max_tp": 100,
+        "atk": 25,
+        "mag": 25,
+        "def": 5,
+        "mdef": 5,
+        "spd": 18,
+        "res": 100
+    },
+    "skills": ["uncompressed_blast", "glitch_step"],
+    "equipped_fragments": [],
+    "equipped_modules": []
+}

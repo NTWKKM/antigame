@@ -1,0 +1,20 @@
+{
+    "id": "elias",
+    "name": "Elias",
+    "description": "A former Archive Enforcer suffering from memory fragmentation.",
+    "base_stats": {
+        "hp": 120,
+        "max_hp": 120,
+        "tp": 50,
+        "max_tp": 50,
+        "atk": 18,
+        "mag": 10,
+        "def": 12,
+        "mdef": 8,
+        "spd": 12,
+        "res": 100
+    },
+    "skills": ["strike", "bit_corrosion"],
+    "equipped_fragments": [],
+    "equipped_modules": []
+}

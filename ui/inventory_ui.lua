@@ -1,0 +1,37 @@
+local inventory_ui = {
+    active = false
+}
+
+function inventory_ui.show()
+    inventory_ui.active = true
+end
+
+function inventory_ui.hide()
+    inventory_ui.active = false
+end
+
+function inventory_ui.update(dt)
+    if not inventory_ui.active then return end
+    if input.pressed(usagi.BTN_B) then
+        inventory_ui.hide()
+    end
+end
+
+function inventory_ui.draw(inventory_system)
+    if not inventory_ui.active then return end
+    
+    gfx.rect_fill(20, 20, 280, 140, 1)
+    gfx.rect(20, 20, 280, 140, 7)
+    
+    gfx.print("INVENTORY", 130, 25, 10)
+    
+    local y = 45
+    for id, qty in pairs(inventory_system.items) do
+        gfx.print(id .. " x" .. qty, 30, y, 7)
+        y = y + 12
+    end
+    
+    gfx.print("Currency: " .. inventory_system.currency, 30, 145, 11)
+end
+
+return inventory_ui

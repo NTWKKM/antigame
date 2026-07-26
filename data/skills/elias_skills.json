@@ -1,0 +1,27 @@
+{
+    "skills": {
+        "strike": {
+            "id": "strike",
+            "name": "Strike",
+            "description": "A standard melee attack.",
+            "tp_cost": 0,
+            "power": 1.0,
+            "type": "physical",
+            "target": "single_enemy",
+            "res_impact": 0,
+            "gauge_impact": 3
+        },
+        "bit_corrosion": {
+            "id": "bit_corrosion",
+            "name": "Bit Corrosion",
+            "description": "Infects the target's code, dealing DoT damage.",
+            "tp_cost": 15,
+            "power": 0.5,
+            "type": "tech",
+            "target": "single_enemy",
+            "res_impact": -2,
+            "gauge_impact": 5,
+            "status_effect": "bit_rot"
+        }
+    }
+}

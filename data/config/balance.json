@@ -1,0 +1,13 @@
+{
+    "balance": {
+        "encounter_rate_base": 80,
+        "encounter_rate_variance": 20,
+        "flee_chance_base": 0.6,
+        "res_decay_per_turn": 0.5,
+        "res_decay_per_damage": 0.1,
+        "overdrive_green_min": 10,
+        "overdrive_green_max": 30,
+        "overdrive_red_min": 31,
+        "overdrive_red_max": 50
+    }
+}
