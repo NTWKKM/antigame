@@ -3,6 +3,7 @@ local Combatant = require("battle.combatant")
 local ResolutionGauge = require("battle.resolution_gauge")
 local ReactiveDefense = require("battle.reactive_defense")
 local SyncTech = require("battle.sync_tech")
+local Inventory = require("systems.inventory")
 
 local Timeline = {
     combatants = {},
@@ -10,7 +11,7 @@ local Timeline = {
     active_combatant = nil,
     target = nil,
     player_menu_cursor = 1,
-    player_menu_options = {"Attack", "Sync", "Defend"}
+    player_menu_options = {"Attack", "Skills", "Sync", "Items", "Defend"}
 }
 
 function Timeline.init(party_data, enemy_data)
@@ -54,7 +55,6 @@ function Timeline.update(dt)
             end
         end
     elseif Timeline.state == "player_turn" then
-        -- Navigate player menu
         if input.pressed(input.UP) then
             Timeline.player_menu_cursor = Timeline.player_menu_cursor - 1
             if Timeline.player_menu_cursor < 1 then Timeline.player_menu_cursor = #Timeline.player_menu_options end
@@ -75,9 +75,27 @@ function Timeline.update(dt)
                     local final_dmg = math.floor(base_dmg * mods.dmg_out)
                     Timeline.execute_attack(Timeline.active_combatant, target, final_dmg)
                     ResolutionGauge.apply_action(3)
+                    Timeline.check_overheat()
+                end
+            elseif choice == "Skills" then
+                Timeline.state = "skills_menu"
+                Timeline.skill_cursor = 1
+                sfx.play("select")
+            elseif choice == "Items" then
+                Timeline.state = "items_menu"
+                Timeline.item_cursor = 1
+                
+                Timeline.item_list = {}
+                for id, qty in pairs(Inventory.items) do
+                    table.insert(Timeline.item_list, id)
+                end
+                if #Timeline.item_list > 0 then
+                    sfx.play("select")
+                else
+                    sfx.play("jump")
+                    Timeline.state = "player_turn"
                 end
             elseif choice == "Sync" then
-                -- Check available sync techs
                 local ready = {}
                 for _, c in ipairs(Timeline.combatants) do
                     if not c.is_enemy and (c.state == "ready" or c == Timeline.active_combatant) then
@@ -91,14 +109,98 @@ function Timeline.update(dt)
                     Timeline.sync_cursor = 1
                     sfx.play("select")
                 else
-                    -- No sync available
                     sfx.play("jump")
                 end
             elseif choice == "Defend" then
-                -- Defend: skip turn but cool the gauge
                 ResolutionGauge.apply_action(-5)
                 Timeline.active_combatant:reset_atb()
                 Timeline.state = "active"
+            end
+        end
+    elseif Timeline.state == "skills_menu" then
+        local skills = Timeline.active_combatant.skills or {}
+        local max_cursor = math.max(1, #skills)
+        if input.pressed(input.UP) then
+            Timeline.skill_cursor = Timeline.skill_cursor - 1
+            if Timeline.skill_cursor < 1 then Timeline.skill_cursor = max_cursor end
+            sfx.play("select")
+        elseif input.pressed(input.DOWN) then
+            Timeline.skill_cursor = Timeline.skill_cursor + 1
+            if Timeline.skill_cursor > max_cursor then Timeline.skill_cursor = 1 end
+            sfx.play("select")
+        elseif input.pressed(input.BTN2) then
+            Timeline.state = "player_turn"
+            sfx.play("jump")
+        elseif input.pressed(input.BTN1) and #skills > 0 then
+            local skill_id = skills[Timeline.skill_cursor]
+            local mods = ResolutionGauge.get_modifiers()
+            local tp_cost = math.floor(10 * mods.cost) -- Base cost 10 for all for now
+            if Timeline.active_combatant.tp >= tp_cost then
+                Timeline.active_combatant.tp = Timeline.active_combatant.tp - tp_cost
+                local target = Timeline.get_random_target(true)
+                if target then
+                    local final_dmg = math.floor((Timeline.active_combatant.atk * 1.5) * mods.dmg_out)
+                    Timeline.execute_attack(Timeline.active_combatant, target, final_dmg)
+                    ResolutionGauge.apply_action(5)
+                    Timeline.check_overheat()
+                end
+            else
+                sfx.play("jump")
+            end
+        end
+    elseif Timeline.state == "items_menu" then
+        local max_cursor = math.max(1, #Timeline.item_list)
+        if input.pressed(input.UP) then
+            Timeline.item_cursor = Timeline.item_cursor - 1
+            if Timeline.item_cursor < 1 then Timeline.item_cursor = max_cursor end
+            sfx.play("select")
+        elseif input.pressed(input.DOWN) then
+            Timeline.item_cursor = Timeline.item_cursor + 1
+            if Timeline.item_cursor > max_cursor then Timeline.item_cursor = 1 end
+            sfx.play("select")
+        elseif input.pressed(input.BTN2) then
+            Timeline.state = "player_turn"
+            sfx.play("jump")
+        elseif input.pressed(input.BTN1) and #Timeline.item_list > 0 then
+            local item_id = Timeline.item_list[Timeline.item_cursor]
+            Inventory.remove_item(item_id, 1)
+            -- Apply effect (hardcoded for now)
+            Timeline.active_combatant.hp = math.min(Timeline.active_combatant.max_hp, Timeline.active_combatant.hp + 50)
+            ResolutionGauge.apply_action(-10) -- Items cool the gauge
+            Timeline.active_combatant:reset_atb()
+            Timeline.state = "active"
+            sfx.play("hit")
+        end
+    elseif Timeline.state == "skills_menu" then
+        local menu_x = 180
+        local menu_y = usagi.GAME_H - 70
+        gfx.rect_fill(menu_x, menu_y, 130, 60, gfx.COLOR_BLACK)
+        gfx.rect(menu_x, menu_y, 130, 60, gfx.COLOR_WHITE)
+        gfx.text("SKILLS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
+        local skills = Timeline.active_combatant.skills or {}
+        local mods = ResolutionGauge.get_modifiers()
+        local cost = math.floor(10 * mods.cost)
+        for i, opt in ipairs(skills) do
+            local color = gfx.COLOR_WHITE
+            if i == Timeline.skill_cursor then color = gfx.COLOR_YELLOW end
+            gfx.text(opt .. " [" .. cost .. "TP]", menu_x + 15, menu_y + 15 + (i * 10), color)
+            if i == Timeline.skill_cursor then
+                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 10), gfx.COLOR_YELLOW)
+            end
+        end
+    elseif Timeline.state == "items_menu" then
+        local menu_x = 180
+        local menu_y = usagi.GAME_H - 70
+        gfx.rect_fill(menu_x, menu_y, 130, 60, gfx.COLOR_BLACK)
+        gfx.rect(menu_x, menu_y, 130, 60, gfx.COLOR_WHITE)
+        gfx.text("ITEMS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
+        for i, opt in ipairs(Timeline.item_list or {}) do
+            local qty = Inventory.items[opt] or 0
+            local color = gfx.COLOR_WHITE
+            if i == Timeline.item_cursor then color = gfx.COLOR_YELLOW end
+            gfx.text(opt .. " x" .. qty, menu_x + 15, menu_y + 15 + (i * 10), color)
+            if i == Timeline.item_cursor then
+                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 10), gfx.COLOR_YELLOW)
             end
         end
     elseif Timeline.state == "sync_menu" then
@@ -110,7 +212,7 @@ function Timeline.update(dt)
             Timeline.sync_cursor = Timeline.sync_cursor + 1
             if Timeline.sync_cursor > #Timeline.sync_options then Timeline.sync_cursor = 1 end
             sfx.play("select")
-        elseif input.pressed(input.BTN2) then -- Cancel
+        elseif input.pressed(input.BTN2) then
             Timeline.state = "player_turn"
             sfx.play("jump")
         elseif input.pressed(input.BTN1) then
@@ -119,20 +221,13 @@ function Timeline.update(dt)
             if target then
                 local mods = ResolutionGauge.get_modifiers()
                 local dmg = math.floor(Timeline.active_combatant.atk * combo.damage_mult * mods.dmg_out)
-                target:take_damage(dmg)
-                sfx.play("hit")
-                ResolutionGauge.apply_action(10) -- High gauge cost
-                
-                -- Reset ATB for both participants
+                Timeline.execute_attack(Timeline.active_combatant, target, dmg)
+                ResolutionGauge.apply_action(10)
+                Timeline.check_overheat()
                 for _, c in ipairs(Timeline.combatants) do
                     if not c.is_enemy and (c.name == combo.req1 or c.name == combo.req2) then
                         c:reset_atb()
                     end
-                end
-                
-                Timeline.check_win_loss()
-                if Timeline.state == "sync_menu" then
-                    Timeline.state = "active"
                 end
             end
         end
@@ -153,14 +248,9 @@ function Timeline.update(dt)
             local base_dmg = Timeline.active_combatant.atk or 10
             local mitigation = ReactiveDefense.get_mitigation()
             local final_dmg = math.floor(base_dmg * mitigation * mods.dmg_in)
-            Timeline.target:take_damage(final_dmg)
-            sfx.play("hit")
-            
-            Timeline.active_combatant:reset_atb()
-            Timeline.check_win_loss()
-            if Timeline.state == "qte" then
-                Timeline.state = "active"
-            end
+            Timeline.execute_attack(Timeline.active_combatant, Timeline.target, final_dmg)
+            ResolutionGauge.apply_action(1)
+            Timeline.check_overheat()
         end
     end
 end
@@ -202,6 +292,22 @@ function Timeline.check_win_loss()
     
     if not player_alive then Timeline.state = "lose" end
     if not enemy_alive then Timeline.state = "win" end
+end
+
+
+function Timeline.check_overheat()
+    if ResolutionGauge.value >= ResolutionGauge.max then
+        sfx.play("hit")
+        Camera.shake(5, 0.5)
+        for _, c in ipairs(Timeline.combatants) do
+            if not c.is_enemy and c.state ~= "dead" then
+                local dmg = math.floor(c.max_hp * 0.5)
+                c:take_damage(dmg)
+            end
+        end
+        ResolutionGauge.value = 0
+        Timeline.check_win_loss()
+    end
 end
 
 function Timeline.draw(dt)
@@ -256,6 +362,38 @@ function Timeline.draw(dt)
             gfx.text(opt, menu_x + 15, menu_y + 5 + (i * 10), color)
             if i == Timeline.player_menu_cursor then
                 gfx.text(">", menu_x + 5, menu_y + 5 + (i * 10), gfx.COLOR_YELLOW)
+            end
+        end
+    elseif Timeline.state == "skills_menu" then
+        local menu_x = 180
+        local menu_y = usagi.GAME_H - 70
+        gfx.rect_fill(menu_x, menu_y, 130, 60, gfx.COLOR_BLACK)
+        gfx.rect(menu_x, menu_y, 130, 60, gfx.COLOR_WHITE)
+        gfx.text("SKILLS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
+        local skills = Timeline.active_combatant.skills or {}
+        local mods = ResolutionGauge.get_modifiers()
+        local cost = math.floor(10 * mods.cost)
+        for i, opt in ipairs(skills) do
+            local color = gfx.COLOR_WHITE
+            if i == Timeline.skill_cursor then color = gfx.COLOR_YELLOW end
+            gfx.text(opt .. " [" .. cost .. "TP]", menu_x + 15, menu_y + 15 + (i * 10), color)
+            if i == Timeline.skill_cursor then
+                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 10), gfx.COLOR_YELLOW)
+            end
+        end
+    elseif Timeline.state == "items_menu" then
+        local menu_x = 180
+        local menu_y = usagi.GAME_H - 70
+        gfx.rect_fill(menu_x, menu_y, 130, 60, gfx.COLOR_BLACK)
+        gfx.rect(menu_x, menu_y, 130, 60, gfx.COLOR_WHITE)
+        gfx.text("ITEMS", menu_x + 30, menu_y + 5, gfx.COLOR_YELLOW)
+        for i, opt in ipairs(Timeline.item_list or {}) do
+            local qty = Inventory.items[opt] or 0
+            local color = gfx.COLOR_WHITE
+            if i == Timeline.item_cursor then color = gfx.COLOR_YELLOW end
+            gfx.text(opt .. " x" .. qty, menu_x + 15, menu_y + 15 + (i * 10), color)
+            if i == Timeline.item_cursor then
+                gfx.text(">", menu_x + 5, menu_y + 15 + (i * 10), gfx.COLOR_YELLOW)
             end
         end
     elseif Timeline.state == "sync_menu" then

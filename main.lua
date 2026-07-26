@@ -59,6 +59,12 @@ function _init()
   
   -- Start in EXPLORATION state for now
   State.switch("EXPLORATION")
+  
+  -- Give starting items for testing
+  local Inventory = require("systems.inventory")
+  Inventory.add_item("medkit", 5)
+  Inventory.add_item("chrono_shard", 1)
+  Inventory.add_item("aegis_core", 1)
 end
 
 -- Update loop

@@ -42,6 +42,13 @@ end
 
 function BattleState.exit()
     music.stop()
+    local Party = require("systems.party")
+    local Timeline = require("battle.timeline")
+    for _, c in ipairs(Timeline.combatants) do
+        if not c.is_enemy then
+            Party.update_member_status(c.id, c.hp, c.tp)
+        end
+    end
 end
 
 return BattleState
