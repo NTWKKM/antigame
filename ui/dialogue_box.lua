@@ -130,7 +130,7 @@ function DialogueBox.draw()
     if DialogueBox.speaker ~= "" then
         -- Pick a color based on speaker
         local spk_color = gfx.COLOR_YELLOW -- default yellow
-        if DialogueBox.speaker == "Vanguard" then spk_color = gfx.COLOR_CYAN
+        if DialogueBox.speaker == "Vanguard" then spk_color = gfx.COLOR_BLUE
         elseif DialogueBox.speaker == "Vesper" then spk_color = gfx.COLOR_GREEN
         elseif DialogueBox.speaker == "Lyra" then spk_color = gfx.COLOR_PINK
         else spk_color = gfx.COLOR_RED end

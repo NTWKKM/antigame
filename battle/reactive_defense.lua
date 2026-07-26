@@ -80,8 +80,8 @@ function ReactiveDefense.draw()
     local tx = ReactiveDefense.target_combatant.x + 8 -- center of 16x16 sprite
     local ty = ReactiveDefense.target_combatant.y + 8
     
-    -- Draw static target ring (cyan)
-    gfx.circ(tx, ty, ReactiveDefense.target_radius, gfx.COLOR_CYAN)
+    -- Draw static target ring (blue)
+    gfx.circ(tx, ty, ReactiveDefense.target_radius, gfx.COLOR_BLUE)
     
     if not ReactiveDefense.resolved then
         -- Draw shrinking outer ring (white)

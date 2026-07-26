@@ -6,7 +6,7 @@ function battle_ui.draw_party_status(party)
         local y = 140 + (i - 1) * 12
         gfx.text(member.name, 10, y, gfx.COLOR_WHITE)
         gfx.text(string.format("HP:%3d/%3d", member.hp, member.max_hp), 60, y, gfx.COLOR_RED)
-        gfx.text(string.format("TP:%2d/%2d", member.tp, member.max_tp), 120, y, gfx.COLOR_CYAN)
+        gfx.text(string.format("TP:%2d/%2d", member.tp, member.max_tp), 120, y, gfx.COLOR_BLUE)
         gfx.text(string.format("RES:%d%%", member.stats.res), 170, y, gfx.COLOR_GREEN)
         
         -- Draw sprite on the left side of screen

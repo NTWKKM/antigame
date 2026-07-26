@@ -11,7 +11,7 @@
 - `gfx.COLOR_YELLOW`: `0xFFFF00` (Quest headers & active highlights)
 - `gfx.COLOR_GREEN`: `0x00FF00` (Pristine state indicator & positive stats)
 - `gfx.COLOR_RED`: `0xFF0000` (High UX warning & critical RES alert)
-- `gfx.COLOR_CYAN`: `0x00FFFF` (Tech & sync indicators)
+- `gfx.COLOR_BLUE`: `0x29ADFF` (Tech & sync indicators)
 
 ## Resolution Visual Thresholds
 | RES Range | Status Label | Shader Distortion | HUD Accent | Visual FX |
