@@ -54,7 +54,7 @@ function MenuScreen.update(dt)
             sfx.play("select")
         elseif input.pressed(input.DOWN) then
             MenuScreen.char_cursor = MenuScreen.char_cursor + 1
-            if MenuScreen.char_cursor > #Party.active_party end then MenuScreen.char_cursor = 1 end
+            if MenuScreen.char_cursor > #Party.active_party then MenuScreen.char_cursor = 1 end
             sfx.play("select")
         elseif input.pressed(input.BTN1) then
             MenuScreen.selected_char = Party.members[Party.active_party[MenuScreen.char_cursor]]
