@@ -36,7 +36,9 @@ function Combatant:update_atb(dt)
 end
 
 function Combatant:take_damage(amount)
-    local actual_damage = math.max(1, amount - (self.def / 2))
+    -- amount parameter is raw attack power (or scaled skill power)
+    local mit_factor = 100 / (100 + math.max(0, self.def))
+    local actual_damage = math.max(1, math.floor(amount * mit_factor))
     self.hp = self.hp - actual_damage
     if self.hp <= 0 then
         self.hp = 0

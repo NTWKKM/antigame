@@ -13,24 +13,24 @@ function Party.init()
         elias = {
             id = "elias",
             name = "Elias",
-            hp = 100, max_hp = 100, tp = 20, max_tp = 20,
-            atk = 15, def = 10, spd = 12,
+            hp = 110, max_hp = 110, tp = 25, max_tp = 25,
+            atk = 16, def = 12, spd = 11,
             fragments = {}, -- Equipped Core Fragments
             skills = {"strike", "sync_slash"}
         },
         vesper = {
             id = "vesper",
             name = "Vesper",
-            hp = 80, max_hp = 80, tp = 30, max_tp = 30,
-            atk = 8, def = 12, spd = 15,
+            hp = 85, max_hp = 85, tp = 35, max_tp = 35,
+            atk = 9, def = 14, spd = 16,
             fragments = {},
             skills = {"scan", "heal_drone"}
         },
         lyra = {
             id = "lyra",
             name = "Lyra",
-            hp = 70, max_hp = 70, tp = 40, max_tp = 40,
-            atk = 20, def = 8, spd = 10,
+            hp = 70, max_hp = 70, tp = 50, max_tp = 50,
+            atk = 24, def = 7, spd = 10,
             fragments = {},
             skills = {"fireball", "ice_spike"}
         }

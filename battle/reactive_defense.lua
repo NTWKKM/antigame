@@ -66,7 +66,7 @@ end
 
 function ReactiveDefense.get_mitigation()
     if ReactiveDefense.success_level == "perfect" then
-        return 0.0 -- 0% damage
+        return 0.0 -- 0% damage taken (negated!)
     elseif ReactiveDefense.success_level == "good" then
         return 0.5 -- 50% damage reduction
     end

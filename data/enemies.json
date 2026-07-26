@@ -1,0 +1,48 @@
+{
+  "enemies": {
+    "drone_01": {
+      "id": "drone_01",
+      "name": "Security Drone",
+      "hp": 45,
+      "max_hp": 45,
+      "atk": 12,
+      "def": 8,
+      "spd": 10,
+      "skills": ["shoot"]
+    },
+    "brute_01": {
+      "id": "brute_01",
+      "name": "Heavy Enforcer",
+      "hp": 90,
+      "max_hp": 90,
+      "atk": 22,
+      "def": 18,
+      "spd": 6,
+      "skills": ["smash"]
+    },
+    "scout_01": {
+      "id": "scout_01",
+      "name": "Cipher Scout",
+      "hp": 30,
+      "max_hp": 30,
+      "atk": 9,
+      "def": 5,
+      "spd": 16,
+      "skills": ["quick_strike"]
+    }
+  },
+  "encounters": [
+    {
+      "id": "patrol_1",
+      "enemies": ["drone_01", "scout_01"]
+    },
+    {
+      "id": "heavy_patrol",
+      "enemies": ["brute_01", "drone_01"]
+    },
+    {
+      "id": "ambush",
+      "enemies": ["scout_01", "scout_01", "scout_01"]
+    }
+  ]
+}

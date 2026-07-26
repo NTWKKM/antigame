@@ -1,20 +1,21 @@
 -- battle/resolution_gauge.lua
 local ResolutionGauge = {
     value = 0,
-    min = -50,
-    max = 50,
-    sweet_spot_min = 10,
-    sweet_spot_max = 30
+    min = 0,
+    max = 100,
+    sweet_spot_min = 25,
+    sweet_spot_max = 70
 }
-
--- Chained Echoes style Overdrive gauge
--- Moves based on actions used. 
--- Normal (0-10) -> Normal damage/cost
--- Sweet Spot (10-30) -> High damage, low cost (Resonance)
--- Overheat (30-50) -> Takes more damage, high cost (Instability)
 
 function ResolutionGauge.init()
     ResolutionGauge.value = 0
+    local cfg = usagi.read_json("config/balance.json")
+    if cfg and cfg.balance then
+        ResolutionGauge.min = cfg.balance.gauge_min or 0
+        ResolutionGauge.max = cfg.balance.gauge_max or 100
+        ResolutionGauge.sweet_spot_min = cfg.balance.overdrive_green_min or 25
+        ResolutionGauge.sweet_spot_max = cfg.balance.overdrive_green_max or 70
+    end
 end
 
 function ResolutionGauge.apply_action(skill_impact)

@@ -1,13 +1,23 @@
 {
-    "balance": {
-        "encounter_rate_base": 80,
-        "encounter_rate_variance": 20,
-        "flee_chance_base": 0.6,
-        "res_decay_per_turn": 0.5,
-        "res_decay_per_damage": 0.1,
-        "overdrive_green_min": 10,
-        "overdrive_green_max": 30,
-        "overdrive_red_min": 31,
-        "overdrive_red_max": 50
-    }
+  "balance": {
+    "encounter_rate_base": 80,
+    "encounter_rate_variance": 20,
+    "flee_chance_base": 0.6,
+    "res_decay_per_turn": 0.5,
+    "res_decay_per_damage": 0.1,
+    "gauge_min": 0,
+    "gauge_max": 100,
+    "overdrive_green_min": 25,
+    "overdrive_green_max": 70,
+    "overdrive_red_min": 71,
+    "overdrive_red_max": 100,
+    "gauge_action_attack": 5,
+    "gauge_action_skill": 10,
+    "gauge_action_sync": 25,
+    "gauge_action_defend": -15,
+    "gauge_action_item": -20,
+    "qte_perfect_cool": -5,
+    "qte_good_cool": -2,
+    "qte_miss_heat": 5
+  }
 }

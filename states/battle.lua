@@ -5,12 +5,30 @@ local Party = require("systems.party")
 local BattleState = {}
 
 function BattleState.enter(encounter_data)
-    -- If no encounter passed, do a default test fight
-    encounter_data = encounter_data or {
-        enemies = {
-            {id = "drone_01", name = "Security Drone", hp = 30, max_hp = 30, atk = 8, def = 5, spd = 8, skills = {"shoot"}}
-        }
-    }
+    if not encounter_data then
+        local enemy_db = usagi.read_json("enemies.json")
+        if enemy_db and enemy_db.encounters and enemy_db.enemies then
+            -- Select a random encounter
+            local enc_def = enemy_db.encounters[math.random(1, #enemy_db.encounters)]
+            local active_enemies = {}
+            for _, enemy_id in ipairs(enc_def.enemies) do
+                local template = enemy_db.enemies[enemy_id]
+                if template then
+                    -- Shallow copy template
+                    local e = {}
+                    for k, v in pairs(template) do e[k] = v end
+                    table.insert(active_enemies, e)
+                end
+            end
+            encounter_data = { enemies = active_enemies }
+        else
+            encounter_data = {
+                enemies = {
+                    {id = "drone_01", name = "Security Drone", hp = 45, max_hp = 45, atk = 12, def = 8, spd = 10, skills = {"shoot"}}
+                }
+            }
+        end
+    end
     
     local party_data = Party.get_active_stats()
     
