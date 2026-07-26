@@ -9,7 +9,7 @@ def generate_map():
     ground_data = []
     collision_data = []
     
-    # 17 = Wall, 18 = Floor (assuming these tiles exist)
+    # 17 = Wall, 18-20 = Floor Variations, 30-35 = Machinery
     for y in range(height):
         for x in range(width):
             ground_data.append(17)
@@ -20,8 +20,14 @@ def generate_map():
             for x in range(rx, rx + rw):
                 if 0 <= x < width and 0 <= y < height:
                     idx = y * width + x
-                    ground_data[idx] = 18
-                    collision_data[idx] = 0
+                    ground_data[idx] = random.choice([18, 18, 19])
+                    
+                    # 3% chance for machinery
+                    if random.random() < 0.03:
+                        ground_data[idx] = random.choice([30, 31, 32, 33, 34, 35])
+                        collision_data[idx] = 1 # Solid
+                    else:
+                        collision_data[idx] = 0
 
     # Start room
     carve_rect(20, 40, 10, 8)

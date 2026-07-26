@@ -8,7 +8,9 @@ def generate_map():
     ground_data = []
     collision_data = []
     
-    # 17 = Wall, 18 = Floor (assuming these tiles exist)
+    import random
+    
+    # 17 = Wall, 18-20 = Floor Variations, 21-25 = Props
     for y in range(height):
         for x in range(width):
             ground_data.append(17)
@@ -19,8 +21,15 @@ def generate_map():
             for x in range(rx, rx + rw):
                 if 0 <= x < width and 0 <= y < height:
                     idx = y * width + x
-                    ground_data[idx] = 18
-                    collision_data[idx] = 0
+                    # Random floor variations
+                    ground_data[idx] = random.choice([18, 18, 18, 19, 20])
+                    
+                    # 5% chance to place a prop/debris instead of floor
+                    if random.random() < 0.05:
+                        ground_data[idx] = random.choice([21, 22, 23, 24, 25])
+                        collision_data[idx] = 1 # Props are solid
+                    else:
+                        collision_data[idx] = 0
                     
     # Carve main area for Sector 7 Glitch Zone
     carve_rect(5, 5, 30, 20)

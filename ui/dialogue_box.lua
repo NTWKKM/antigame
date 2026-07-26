@@ -114,18 +114,41 @@ end
 function DialogueBox.draw()
     if not DialogueBox.active then return end
     
-    local box_h = 40
-    local box_y = usagi.GAME_H - box_h - 10
-    local box_w = usagi.GAME_W - 20
+    local box_h = 45
+    local box_y = usagi.GAME_H - box_h - 8
+    local box_w = usagi.GAME_W - 16
+    local box_x = 8
     
-    gfx.rect_fill(10, box_y, box_w, box_h, 0)
-    gfx.rect(10, box_y, box_w, box_h, 7)
+    -- Drop shadow
+    gfx.rect_fill(box_x + 2, box_y + 2, box_w, box_h, 0)
+    -- Main background
+    gfx.rect_fill(box_x, box_y, box_w, box_h, 1) -- dark blue/gray
+    -- Double border
+    gfx.rect(box_x, box_y, box_w, box_h, 6) -- inner border (e.g., cyan/gray)
+    gfx.rect(box_x-1, box_y-1, box_w+2, box_h+2, 5) -- outer border
     
     if DialogueBox.speaker ~= "" then
-        gfx.text(DialogueBox.speaker .. ":", 15, box_y + 5, 10)
-        gfx.text(DialogueBox.display_text, 15, box_y + 18, 7)
+        -- Pick a color based on speaker
+        local spk_color = 10 -- default yellow
+        if DialogueBox.speaker == "Vanguard" then spk_color = 12 -- light blue
+        elseif DialogueBox.speaker == "Vesper" then spk_color = 11 -- green
+        elseif DialogueBox.speaker == "Lyra" then spk_color = 14 -- pink
+        else spk_color = 8 end -- red for enemies or others
+        
+        -- Speaker Shadow
+        gfx.text(DialogueBox.speaker .. ":", box_x + 6, box_y + 5, 0)
+        -- Speaker Text
+        gfx.text(DialogueBox.speaker .. ":", box_x + 5, box_y + 4, spk_color)
+        
+        -- Dialogue Shadow
+        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 19, 0)
+        -- Dialogue Text
+        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 18, 7)
     else
-        gfx.text(DialogueBox.display_text, 15, box_y + 10, 7)
+        -- Dialogue Shadow
+        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 11, 0)
+        -- Dialogue Text
+        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 10, 7)
     end
     
     if ChoiceMenu.active then
