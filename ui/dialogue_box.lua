@@ -120,35 +120,35 @@ function DialogueBox.draw()
     local box_x = 8
     
     -- Drop shadow
-    gfx.rect_fill(box_x + 2, box_y + 2, box_w, box_h, 0)
+    gfx.rect_fill(box_x + 2, box_y + 2, box_w, box_h, gfx.COLOR_BLACK)
     -- Main background
-    gfx.rect_fill(box_x, box_y, box_w, box_h, 1) -- dark blue/gray
+    gfx.rect_fill(box_x, box_y, box_w, box_h, gfx.COLOR_BLACK)
     -- Double border
-    gfx.rect(box_x, box_y, box_w, box_h, 6) -- inner border (e.g., cyan/gray)
-    gfx.rect(box_x-1, box_y-1, box_w+2, box_h+2, 5) -- outer border
+    gfx.rect(box_x, box_y, box_w, box_h, gfx.COLOR_LIGHT_GRAY) -- inner border
+    gfx.rect(box_x-1, box_y-1, box_w+2, box_h+2, gfx.COLOR_DARK_GRAY) -- outer border
     
     if DialogueBox.speaker ~= "" then
         -- Pick a color based on speaker
-        local spk_color = 10 -- default yellow
-        if DialogueBox.speaker == "Vanguard" then spk_color = 12 -- light blue
-        elseif DialogueBox.speaker == "Vesper" then spk_color = 11 -- green
-        elseif DialogueBox.speaker == "Lyra" then spk_color = 14 -- pink
-        else spk_color = 8 end -- red for enemies or others
+        local spk_color = gfx.COLOR_YELLOW -- default yellow
+        if DialogueBox.speaker == "Vanguard" then spk_color = gfx.COLOR_CYAN
+        elseif DialogueBox.speaker == "Vesper" then spk_color = gfx.COLOR_GREEN
+        elseif DialogueBox.speaker == "Lyra" then spk_color = gfx.COLOR_PINK
+        else spk_color = gfx.COLOR_RED end
         
         -- Speaker Shadow
-        gfx.text(DialogueBox.speaker .. ":", box_x + 6, box_y + 5, 0)
+        gfx.text(DialogueBox.speaker .. ":", box_x + 6, box_y + 5, gfx.COLOR_BLACK)
         -- Speaker Text
         gfx.text(DialogueBox.speaker .. ":", box_x + 5, box_y + 4, spk_color)
         
         -- Dialogue Shadow
-        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 19, 0)
+        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 19, gfx.COLOR_BLACK)
         -- Dialogue Text
-        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 18, 7)
+        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 18, gfx.COLOR_WHITE)
     else
         -- Dialogue Shadow
-        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 11, 0)
+        gfx.text(DialogueBox.display_text, box_x + 6, box_y + 11, gfx.COLOR_BLACK)
         -- Dialogue Text
-        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 10, 7)
+        gfx.text(DialogueBox.display_text, box_x + 5, box_y + 10, gfx.COLOR_WHITE)
     end
     
     if ChoiceMenu.active then

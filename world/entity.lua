@@ -38,10 +38,10 @@ end
 function entity:draw()
     if self.animations[self.state] then
         local frame = self.animations[self.state]:get_frame()
-        -- draw sprite frame (assuming sprite 0 for placeholder)
-        gfx.sprite(frame, self.x, self.y)
+        -- draw sprite frame
+        gfx.spr(frame, self.x, self.y)
     else
-        gfx.rect_fill(self.x, self.y, self.width, self.height, 8)
+        gfx.rect_fill(self.x, self.y, self.width, self.height, gfx.COLOR_WHITE)
     end
 end
 

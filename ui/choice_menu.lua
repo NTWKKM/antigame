@@ -38,16 +38,16 @@ function choice_menu.draw()
     local x = (320 - w) / 2
     local y = (180 - h) / 2
     
-    gfx.rect_fill(x, y, w, h, 1)
-    gfx.rect(x, y, w, h, 7)
+    gfx.rect_fill(x, y, w, h, gfx.COLOR_BLACK)
+    gfx.rect(x, y, w, h, gfx.COLOR_WHITE)
     
     for i, choice in ipairs(choice_menu.choices) do
         local cy = y + 4 + (i - 1) * 12
         if i == choice_menu.selected then
-            gfx.text(">", x + 4, cy, 10)
-            gfx.text(choice.text, x + 16, cy, 10)
+            gfx.text(">", x + 4, cy, gfx.COLOR_YELLOW)
+            gfx.text(choice.text, x + 16, cy, gfx.COLOR_YELLOW)
         else
-            gfx.text(choice.text, x + 16, cy, 7)
+            gfx.text(choice.text, x + 16, cy, gfx.COLOR_WHITE)
         end
     end
 end

@@ -81,24 +81,24 @@ function ReactiveDefense.draw()
     local ty = ReactiveDefense.target_combatant.y + 8
     
     -- Draw static target ring (cyan)
-    gfx.circ(tx, ty, ReactiveDefense.target_radius, 11)
+    gfx.circ(tx, ty, ReactiveDefense.target_radius, gfx.COLOR_CYAN)
     
     if not ReactiveDefense.resolved then
         -- Draw shrinking outer ring (white)
-        gfx.circ(tx, ty, math.max(1, math.floor(ReactiveDefense.current_radius)), 7)
+        gfx.circ(tx, ty, math.max(1, math.floor(ReactiveDefense.current_radius)), gfx.COLOR_WHITE)
     else
         -- Draw feedback word
         if ReactiveDefense.success_level == "perfect" then
-            gfx.text("PERFECT", tx - 15, ty - 20, 11)
+            gfx.text("PERFECT", tx - 15, ty - 20, gfx.COLOR_GREEN)
         elseif ReactiveDefense.success_level == "good" then
-            gfx.text("GOOD", tx - 8, ty - 20, 10)
+            gfx.text("GOOD", tx - 8, ty - 20, gfx.COLOR_YELLOW)
         else
-            gfx.text("MISS", tx - 8, ty - 20, 8)
+            gfx.text("MISS", tx - 8, ty - 20, gfx.COLOR_RED)
         end
     end
     
     -- Draw Attack Name
-    gfx.text(ReactiveDefense.attack_name, tx - 10, ty + 15, 8)
+    gfx.text(ReactiveDefense.attack_name, tx - 10, ty + 15, gfx.COLOR_WHITE)
 end
 
 return ReactiveDefense

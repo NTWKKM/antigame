@@ -125,6 +125,22 @@ def generate_wav(filepath, freq=440.0, duration=0.2, vol=0.5):
             data = struct.pack('<h', value)
             w.writeframesraw(data)
 
+def generate_glitch_wav(filepath, duration=0.25, vol=0.5):
+    sample_rate = 44100
+    num_samples = int(duration * sample_rate)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with wave.open(filepath, 'w') as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sample_rate)
+        for i in range(num_samples):
+            t = i / sample_rate
+            freq = 120.0 + (math.sin(t * 150.0) * 300.0) + ((i % 17) * 40.0)
+            env = 1.0 - (i / num_samples)
+            value = int(vol * env * 32767.0 * math.sin(2.0 * math.pi * freq * t))
+            data = struct.pack('<h', value)
+            w.writeframesraw(data)
+
 def generate_music_placeholder(filepath):
     generate_wav(filepath, freq=220.0, duration=1.0, vol=0.3)
 
@@ -133,5 +149,7 @@ if __name__ == '__main__':
     generate_wav('sfx/hit.wav', freq=150.0, duration=0.1)
     generate_wav('sfx/jump.wav', freq=600.0, duration=0.15)
     generate_wav('sfx/select.wav', freq=800.0, duration=0.05)
+    generate_glitch_wav('sfx/glitch.wav', duration=0.25)
     generate_music_placeholder('music/theme.wav')
     print("Enhanced pixel art assets generated.")
+

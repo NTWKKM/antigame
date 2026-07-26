@@ -20,18 +20,18 @@ end
 function inventory_ui.draw(inventory_system)
     if not inventory_ui.active then return end
     
-    gfx.rect_fill(20, 20, 280, 140, 1)
-    gfx.rect(20, 20, 280, 140, 7)
+    gfx.rect_fill(20, 20, 280, 140, gfx.COLOR_BLACK)
+    gfx.rect(20, 20, 280, 140, gfx.COLOR_WHITE)
     
-    gfx.print("INVENTORY", 130, 25, 10)
+    gfx.text("INVENTORY", 130, 25, gfx.COLOR_YELLOW)
     
     local y = 45
     for id, qty in pairs(inventory_system.items) do
-        gfx.print(id .. " x" .. qty, 30, y, 7)
+        gfx.text(id .. " x" .. qty, 30, y, gfx.COLOR_WHITE)
         y = y + 12
     end
     
-    gfx.print("Currency: " .. inventory_system.currency, 30, 145, 11)
+    gfx.text("Currency: " .. inventory_system.currency, 30, 145, gfx.COLOR_GREEN)
 end
 
 return inventory_ui

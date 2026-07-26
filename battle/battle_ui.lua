@@ -4,10 +4,10 @@ function battle_ui.draw_party_status(party)
     for i, member in ipairs(party) do
         -- Draw text UI at the bottom
         local y = 140 + (i - 1) * 12
-        gfx.text(member.name, 10, y, 7)
-        gfx.text(string.format("HP:%3d/%3d", member.hp, member.max_hp), 60, y, 8)
-        gfx.text(string.format("TP:%2d/%2d", member.tp, member.max_tp), 120, y, 12)
-        gfx.text(string.format("RES:%d%%", member.stats.res), 170, y, 11)
+        gfx.text(member.name, 10, y, gfx.COLOR_WHITE)
+        gfx.text(string.format("HP:%3d/%3d", member.hp, member.max_hp), 60, y, gfx.COLOR_RED)
+        gfx.text(string.format("TP:%2d/%2d", member.tp, member.max_tp), 120, y, gfx.COLOR_CYAN)
+        gfx.text(string.format("RES:%d%%", member.stats.res), 170, y, gfx.COLOR_GREEN)
         
         -- Draw sprite on the left side of screen
         local char_x = 40
@@ -31,10 +31,10 @@ function battle_ui.draw_enemies(enemies)
         gfx.spr(5, x, y)
         
         -- HP Bar under enemy
-        gfx.text(enemy.name, x - 10, y - 10, 7)
-        gfx.rect_fill(x - 5, y + 18, 26, 4, 1)
+        gfx.text(enemy.name, x - 10, y - 10, gfx.COLOR_WHITE)
+        gfx.rect_fill(x - 5, y + 18, 26, 4, gfx.COLOR_BLACK)
         local hp_pct = enemy.hp / enemy.max_hp
-        gfx.rect_fill(x - 5, y + 18, math.max(1, 26 * hp_pct), 4, 8)
+        gfx.rect_fill(x - 5, y + 18, math.max(1, 26 * hp_pct), 4, gfx.COLOR_RED)
     end
 end
 

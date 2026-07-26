@@ -1,11 +1,9 @@
-#version 330
+#version 100
+precision mediump float;
 
 // Inputs from raylib
-in vec2 fragTexCoord;
-in vec4 fragColor;
-
-// Output
-out vec4 finalColor;
+varying vec2 fragTexCoord;
+varying vec4 fragColor;
 
 // Uniforms
 uniform sampler2D texture0;
@@ -20,10 +18,10 @@ void main() {
     float ca_amount = 0.008 * i;
     vec2 offset = vec2(ca_amount * sin(u_time * 10.0), 0.0);
     
-    float r = texture(texture0, fragTexCoord + offset).r;
-    float g = texture(texture0, fragTexCoord).g;
-    float b = texture(texture0, fragTexCoord - offset).b;
-    float a = texture(texture0, fragTexCoord).a;
+    float r = texture2D(texture0, fragTexCoord + offset).r;
+    float g = texture2D(texture0, fragTexCoord).g;
+    float b = texture2D(texture0, fragTexCoord - offset).b;
+    float a = texture2D(texture0, fragTexCoord).a;
     
     vec4 col = vec4(r, g, b, a);
     
@@ -44,5 +42,5 @@ void main() {
         col.rgb = mix(col.rgb, vec3(lum), desat * 0.6);
     }
     
-    finalColor = col * fragColor;
+    gl_FragColor = col * fragColor;
 }

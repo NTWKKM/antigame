@@ -61,3 +61,7 @@
 3. **ADR-003: Environment-Guarded Development Initializers**:
    - **Context**: Debug item injection in `main.lua` threatened production save state purity.
    - **Decision**: All developer testing shortcuts must be explicitly guarded behind `if usagi and usagi.IS_DEV then` blocks.
+
+4. **ADR-004: Usagi GFX API and Cross-Platform Raylib Shader Standards**:
+   - **Context**: Legacy Pico-8 0-indexed color literals and Love2D shader syntax caused runtime crashes and visual distortion.
+   - **Decision**: All UI/Battle drawing must use Usagi `gfx.text`/`gfx.spr` APIs and explicit `gfx.COLOR_*` constants. Post-processing shaders must be implemented in Raylib GLSL `#version 330` (`.fs`) and `#version 100` (`_es.fs`) with `intensity` and `u_time` uniforms.

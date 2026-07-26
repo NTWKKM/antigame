@@ -85,6 +85,7 @@ function _draw(dt)
   -- Set post-process shader driven by Resolution stat
   gfx.shader_set("resolution_decay")
   gfx.shader_uniform("intensity", ResolutionDecay.get_shader_intensity())
+  gfx.shader_uniform("u_time", usagi.elapsed or 0)
 
   -- Clear screen to black by default
   gfx.clear(gfx.COLOR_BLACK)

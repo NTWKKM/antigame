@@ -26,8 +26,8 @@ function notification.draw()
         -- In Usagi, colors are indexed. For fading we might just not draw or dither.
         -- We'll just skip drawing if it's dead.
         local y = 10 + (i - 1) * 15
-        gfx.rect_fill(320 - (#msg.text * 4) - 20, y - 2, (#msg.text * 4) + 10, 11, 1)
-        gfx.print(msg.text, 320 - (#msg.text * 4) - 15, y, 7)
+        gfx.rect_fill(320 - (#msg.text * 4) - 20, y - 2, (#msg.text * 4) + 10, 11, gfx.COLOR_BLACK)
+        gfx.text(msg.text, 320 - (#msg.text * 4) - 15, y, gfx.COLOR_WHITE)
     end
 end
 
