@@ -1,0 +1,40 @@
+{
+  "ch1_intro": [
+    {
+      "speaker": "Elias",
+      "text": "The air in the Inner Ring is always 32K pristine... yet why does it taste like fake pixels?"
+    },
+    {
+      "speaker": "Retina Display UI",
+      "text": "CURRENT UX INDEX: 98.4 [TOP 0.1% TIER]. MAINTAIN PURITY TO PRESERVE HIGH-RES QUOTA."
+    },
+    {
+      "speaker": "Elias",
+      "text": "Right. Keep your head down, keep your rendering smooth, and never look down at the slums."
+    }
+  ],
+  "ch2_silence_hour": [
+    {
+      "speaker": "System Announcement",
+      "text": "ATTENTION CITIZENS. THE SILENCE HOUR RITUAL HAS COMMENCED. HALT MOVEMENT."
+    },
+    {
+      "speaker": "Elias",
+      "text": "Every 15 minutes, the lighting resets and the scent of synthetic lavender repeats..."
+    }
+  ],
+  "ch5_foreign_ozone": [
+    {
+      "speaker": "Elias",
+      "text": "Wait... what is that smell? It's not lavender. It's... ozone? Burning copper?"
+    },
+    {
+      "speaker": "Retina Display UI",
+      "text": "WARNING: MINOR STUTTER DETECTED IN SECTOR 7 SUBSTATION. DOWN-SCALING ADVISORY."
+    },
+    {
+      "speaker": "Elias",
+      "text": "A frame drop in the Inner Ring? Impossible. I need to investigate."
+    }
+  ]
+}

@@ -11,6 +11,7 @@ Camera = require("engine.camera")
 Party = require("systems.party")
 ResolutionDecay = require("systems.resolution_decay")
 UXIndex = require("systems.ux_index")
+QuestTracker = require("systems.quest_tracker")
 
 -- Require world components (stubs for now)
 -- Player = require("world.player")
@@ -55,6 +56,7 @@ function _init()
   Party.init()
   ResolutionDecay.init()
   UXIndex.init()
+  QuestTracker.init()
   State.init()
   
   -- Start in EXPLORATION state for now

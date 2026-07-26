@@ -17,7 +17,13 @@ function HUD.draw()
     local ux_color = GameState.ux > 80 and gfx.COLOR_RED or gfx.COLOR_YELLOW
     gfx.text(ux_str, 2, 12, ux_color)
     
-    -- We can also draw party HP here if needed
+    -- Top right corner: Current Chapter & Resolution State
+    if QuestTracker then
+        local q_name = QuestTracker.current_quest or ""
+        local state_str = "[" .. (QuestTracker.resolution_state or "Pristine") .. "]"
+        gfx.text(q_name, usagi.GAME_W - 170, 2, gfx.COLOR_YELLOW)
+        gfx.text(state_str, usagi.GAME_W - 70, 12, gfx.COLOR_GREEN)
+    end
 end
 
 return HUD
