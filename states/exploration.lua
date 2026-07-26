@@ -83,7 +83,7 @@ function ExplorationState.update(dt)
             ExplorationState.step_counter = 0
             -- 30% chance of encounter per threshold
             if math.random() < 0.30 then
-                Transition.play("iris_out", 1.0, function() State.switch("BATTLE") end)
+                Transition.start("iris_out", 1.0, function() State.push("BATTLE") end)
             end
         end
     end

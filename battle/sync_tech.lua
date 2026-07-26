@@ -7,26 +7,24 @@ local SyncTech = {
 -- If two characters are "ready" in ATB, they can combine specific skills
 
 function SyncTech.init()
-    SyncTech.combos = {
-        archive_breach = {
-            id = "archive_breach",
-            name = "Archive Breach",
-            req1 = "Elias",
-            req2 = "Vesper",
-            damage_mult = 3.0,
-            target = "single",
-            cost = 0 
-        },
-        lunar_flare = {
-            id = "lunar_flare",
-            name = "Lunar Flare",
-            req1 = "Lyra",
-            req2 = "Vesper",
-            damage_mult = 2.5,
-            target = "all",
-            cost = 0 
-        }
-    }
+    SyncTech.combos = {}
+    local data = usagi.read_json("data/skills/sync_techs.json")
+    if data and data.sync_techs then
+        for id, tech in pairs(data.sync_techs) do
+            local req1 = tech.req_chars and tech.req_chars[1] or ""
+            local req2 = tech.req_chars and tech.req_chars[2] or ""
+            local combo = {
+                id = tech.id,
+                name = tech.name,
+                req1 = req1:gsub("^%l", string.upper),
+                req2 = req2:gsub("^%l", string.upper),
+                damage_mult = tech.power or 1.0,
+                target = tech.target == "all_enemies" and "all" or "single",
+                cost = tech.req_tp or 0
+            }
+            SyncTech.combos[id] = combo
+        end
+    end
 end
 
 function SyncTech.get_available(ready_combatants)

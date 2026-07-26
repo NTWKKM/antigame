@@ -9,6 +9,7 @@ local function load_skills()
     local files = {
         "data/skills/elias_skills.json",
         "data/skills/vesper_skills.json",
+        "data/skills/lyra_skills.json",
         "data/skills/sync_techs.json"
     }
     
@@ -45,23 +46,22 @@ function skill_executor.execute(skill_id, user, target)
     
     if skill_data.type == "support" then
         if skill_data.heal_power then
-            result.damage = -math.max(1, user.stats.mag * skill_data.heal_power)
-            if target.hp then
-                target.hp = math.min(target.max_hp or target.hp, target.hp - result.damage)
-            end
+            result.damage = -math.max(1, (user.stats and user.stats.mag or user.mag or 1) * skill_data.heal_power)
         end
     else
         local dmg = 0
+        local atk = user.stats and user.stats.atk or user.atk or 1
+        local mag = user.stats and user.stats.mag or user.mag or 1
+        local def = target.stats and target.stats.def or target.def or 1
+        local mdef = target.stats and target.stats.mdef or target.mdef or 1
+
         if skill_data.type == "physical" then
-            dmg = math.max(1, (user.stats.atk * skill_data.power) - ((target.stats.def or 0) / 2))
+            dmg = math.max(1, (atk * skill_data.power) - (def / 2))
         elseif skill_data.type == "tech" then
-            dmg = math.max(1, (user.stats.mag * skill_data.power) - ((target.stats.mdef or 0) / 2))
+            dmg = math.max(1, (mag * skill_data.power) - (mdef / 2))
         end
         
         result.damage = dmg
-        if target.hp then
-            target.hp = math.max(0, target.hp - dmg)
-        end
     end
     
     return result

@@ -79,9 +79,12 @@ function Actions.handle_player_menu(Timeline)
         if choice == "Attack" then
             local target = Actions.get_random_target(Timeline, true)
             if target then
+                local SkillExecutor = require("battle.skill_executor")
+                local result = SkillExecutor.execute("strike", Timeline.active_combatant, target)
+                
                 local mods = ResolutionGauge.get_modifiers()
-                local base_dmg = Timeline.active_combatant.atk
-                local final_dmg = math.floor(base_dmg * mods.dmg_out)
+                local final_dmg = math.floor(result.damage * mods.dmg_out)
+                
                 Camera.shake(3, 0.2)
                 Actions.execute_attack(Timeline, Timeline.active_combatant, target, final_dmg)
                 ResolutionGauge.apply_action(5)
@@ -133,10 +136,14 @@ function Actions.handle_enemy_turn(Timeline, dt)
     Timeline.enemy_timer = Timeline.enemy_timer - dt
     if Timeline.enemy_timer <= 0 then
         local attacker = Timeline.active_combatant
-        local skill = "Strike"
-        if attacker.skills and #attacker.skills > 0 then
-            skill = attacker.skills[math.random(1, #attacker.skills)]
+        
+        local players = {}
+        for _, c in ipairs(Timeline.combatants) do
+            if not c.is_enemy and c.state ~= "dead" then table.insert(players, c) end
         end
+        
+        local EnemyAI = require("battle.enemy_ai")
+        local skill, target = EnemyAI.decide_action(attacker, players)
 
         if skill == "overclock" then
             for _, c in ipairs(Timeline.combatants) do
@@ -153,7 +160,6 @@ function Actions.handle_enemy_turn(Timeline, dt)
                 Timeline.state = "active"
             end
         else
-            local target = Actions.get_random_target(Timeline, false)
             if target then
                 Camera.shake(2, 0.2)
                 ReactiveDefense.start(target, skill, 1.0)

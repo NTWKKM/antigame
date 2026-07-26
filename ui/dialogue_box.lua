@@ -59,7 +59,7 @@ end
 
 function DialogueBox.execute_action(action, target)
     if action == "start_battle" then
-        State.switch("BATTLE", target)
+        State.push("BATTLE", target)
     elseif action == "join_party" then
         local Party = require("systems.party")
         Party.add_member(target)
@@ -74,7 +74,7 @@ function DialogueBox.execute_action(action, target)
             end
         end
     elseif action == "map_transition" then
-        State.switch("EXPLORATION", target)
+        State.swap("EXPLORATION", target)
     end
 end
 

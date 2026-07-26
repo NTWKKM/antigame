@@ -85,11 +85,11 @@ function BattleState.update(dt)
                 Inventory.add_item(item, 1)
             end
             Inventory.add_currency(VictoryScreen.cubes_earned)
-            State.switch("EXPLORATION")
+            State.pop()
         end
     elseif Timeline.state == "lose" then
         if input.pressed(input.BTN1) then
-            State.switch("EXPLORATION")
+            State.pop()
         end
     end
 end

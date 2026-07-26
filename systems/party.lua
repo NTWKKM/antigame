@@ -9,32 +9,25 @@ local Party = {
 -- Elias (DPS/Sync), Vesper (Support/Tech), Lyra (Mage/AOE)
 
 function Party.init()
-    Party.members = {
-        elias = {
-            id = "elias",
-            name = "Elias",
-            hp = 110, max_hp = 110, tp = 25, max_tp = 25,
-            atk = 16, def = 12, spd = 11,
-            fragments = {}, -- Equipped Core Fragments
-            skills = {"strike", "sync_slash"}
-        },
-        vesper = {
-            id = "vesper",
-            name = "Vesper",
-            hp = 85, max_hp = 85, tp = 35, max_tp = 35,
-            atk = 9, def = 14, spd = 16,
-            fragments = {},
-            skills = {"scan", "heal_drone"}
-        },
-        lyra = {
-            id = "lyra",
-            name = "Lyra",
-            hp = 70, max_hp = 70, tp = 50, max_tp = 50,
-            atk = 24, def = 7, spd = 10,
-            fragments = {},
-            skills = {"fireball", "ice_spike"}
-        }
-    }
+    Party.members = {}
+    local chars = {"elias", "vesper", "lyra"}
+    for _, id in ipairs(chars) do
+        local data = usagi.read_json("data/characters/" .. id .. ".json")
+        if data then
+            local member = {
+                id = data.id,
+                name = data.name,
+                fragments = data.equipped_fragments or {},
+                skills = data.skills or {}
+            }
+            if data.base_stats then
+                for k, v in pairs(data.base_stats) do
+                    member[k] = v
+                end
+            end
+            Party.members[id] = member
+        end
+    end
     
     -- Load from GameState if exists
     if GameState and GameState.party then

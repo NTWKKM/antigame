@@ -1,0 +1,14 @@
+{
+    "skills": {
+        "uncompressed_blast": {
+            "name": "Uncompressed Blast",
+            "type": "tech",
+            "power": 1.5
+        },
+        "glitch_step": {
+            "name": "Glitch Step",
+            "type": "support",
+            "heal_power": 0.5
+        }
+    }
+}
