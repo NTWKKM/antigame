@@ -48,13 +48,13 @@ end
 function Tween.easeOutBack(t)
     local c1 = 1.70158
     local c3 = c1 + 1
-    return 1 + c3 * math.pow(t - 1, 3) + c1 * math.pow(t - 1, 2)
+    return 1 + c3 * ((t - 1) ^ 3) + c1 * ((t - 1) ^ 2)
 end
 
 function Tween.easeOutElastic(t)
     if t == 0 or t == 1 then return t end
     local c4 = (2 * math.pi) / 3
-    return math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * c4) + 1
+    return (2 ^ (-10 * t)) * math.sin((t * 10 - 0.75) * c4) + 1
 end
 
 function Tween.easeOutBounce(t)
@@ -76,12 +76,12 @@ end
 
 function Tween.easeInExpo(t)
     if t == 0 then return 0 end
-    return math.pow(2, 10 * (t - 1))
+    return 2 ^ (10 * (t - 1))
 end
 
 function Tween.easeOutExpo(t)
     if t == 1 then return 1 end
-    return 1 - math.pow(2, -10 * t)
+    return 1 - (2 ^ (-10 * t))
 end
 
 --------------------------------------------------------------------

@@ -194,7 +194,7 @@ function FX.spawn_impact(x, y, direction_x, count, color)
     count = count or 6
     color = color or gfx.COLOR_WHITE
     for i = 1, count do
-        local angle = math.atan2(0, direction_x) + (math.random() - 0.5) * 1.5
+        local angle = math.atan(0, direction_x) + (math.random() - 0.5) * 1.5
         local spd = 40 + math.random() * 30
         table.insert(FX.particles, {
             x = x,
