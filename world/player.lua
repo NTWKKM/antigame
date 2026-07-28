@@ -95,7 +95,7 @@ function Player.update(dt)
         if Player.anim_timer > 0.15 then
             Player.anim_timer = 0
             Player.frame = Player.frame + 1
-            FX.spawn("dust", Player.x + 8, Player.y + 16, 0.5, 0)
+            FX.spawn_particles(Player.x + 8, Player.y + 16, 3, gfx.COLOR_LIGHT_GRAY, 10, 0.3)
         end
     end
 end

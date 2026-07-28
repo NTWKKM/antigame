@@ -29,7 +29,7 @@ function transition.update(dt)
 end
 
 local function easeInOutQuad(x)
-    return x < 0.5 and 2 * x * x or 1 - math.pow(-2 * x + 2, 2) / 2
+    return x < 0.5 and 2 * x * x or 1 - ((-2 * x + 2) ^ 2) / 2
 end
 
 function transition.draw()

@@ -7,10 +7,10 @@ local function load_skills()
     cached_skills = {}
     
     local files = {
-        "data/skills/elias_skills.json",
-        "data/skills/vesper_skills.json",
-        "data/skills/lyra_skills.json",
-        "data/skills/sync_techs.json"
+        "skills/elias_skills.json",
+        "skills/vesper_skills.json",
+        "skills/lyra_skills.json",
+        "skills/sync_techs.json"
     }
     
     for _, f in ipairs(files) do

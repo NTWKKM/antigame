@@ -8,7 +8,7 @@ local SyncTech = {
 
 function SyncTech.init()
     SyncTech.combos = {}
-    local data = usagi.read_json("data/skills/sync_techs.json")
+    local data = usagi.read_json("skills/sync_techs.json")
     if data and data.sync_techs then
         for id, tech in pairs(data.sync_techs) do
             local req1 = tech.req_chars and tech.req_chars[1] or ""

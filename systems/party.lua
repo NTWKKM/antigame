@@ -12,7 +12,7 @@ function Party.init()
     Party.members = {}
     local chars = {"elias", "vesper", "lyra"}
     for _, id in ipairs(chars) do
-        local data = usagi.read_json("data/characters/" .. id .. ".json")
+        local data = usagi.read_json("characters/" .. id .. ".json")
         if data then
             local member = {
                 id = data.id,

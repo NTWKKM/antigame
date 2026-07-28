@@ -7,8 +7,8 @@ local VictoryScreen = require("battle.victory_screen")
 local Inventory = require("systems.inventory")
 
 function BattleState.enter(encounter_data)
-    local enemy_db = usagi.read_json("data/enemies/arc1_enemies.json") or usagi.read_json("enemies/arc1_enemies.json")
-    local encounter_db = usagi.read_json("data/encounters/arc1_encounters.json") or usagi.read_json("encounters/arc1_encounters.json")
+    local enemy_db = usagi.read_json("enemies/arc1_enemies.json")
+    local encounter_db = usagi.read_json("encounters/arc1_encounters.json")
     
     if type(encounter_data) == "string" and encounter_db and encounter_db.encounters then
         -- Find specific encounter by ID
@@ -37,20 +37,28 @@ function BattleState.enter(encounter_data)
 
     if not encounter_data then
         if encounter_db and encounter_db.encounters and enemy_db and enemy_db.enemies then
-            -- Select a random encounter
-            local enc_def = encounter_db.encounters[math.random(1, #encounter_db.encounters)]
-            local active_enemies = {}
-            for _, enemy_id in ipairs(enc_def.enemies) do
-                local template = enemy_db.enemies[enemy_id]
-                if template then
-                    -- Shallow copy template
-                    local e = {}
-                    for k, v in pairs(template) do e[k] = v end
-                    table.insert(active_enemies, e)
-                end
+            -- Collect encounters into a list
+            local enc_list = {}
+            for _, enc in pairs(encounter_db.encounters) do
+                table.insert(enc_list, enc)
             end
-            encounter_data = { enemies = active_enemies, music = enc_def.music }
-        else
+            
+            if #enc_list > 0 then
+                local enc_def = enc_list[math.random(1, #enc_list)]
+                local active_enemies = {}
+                for _, enemy_id in ipairs(enc_def.enemies) do
+                    local template = enemy_db.enemies[enemy_id]
+                    if template then
+                        -- Shallow copy template
+                        local e = {}
+                        for k, v in pairs(template) do e[k] = v end
+                        table.insert(active_enemies, e)
+                    end
+                end
+                encounter_data = { enemies = active_enemies, music = enc_def.music }
+            end
+        end
+        if not encounter_data then
             encounter_data = {
                 enemies = {
                     {id = "drone_01", name = "Security Drone", hp = 45, max_hp = 45, atk = 12, def = 8, spd = 10, skills = {"shoot"}}

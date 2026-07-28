@@ -24,7 +24,7 @@ function VictoryScreen.start(combatants)
     VictoryScreen.items_dropped = {}
     VictoryScreen.party_members = {}
     
-    local enemy_db = usagi.read_json("data/enemies/arc1_enemies.json")
+    local enemy_db = usagi.read_json("enemies/arc1_enemies.json")
     local enemies_data = enemy_db and enemy_db.enemies or {}
     
     for _, c in ipairs(combatants) do
