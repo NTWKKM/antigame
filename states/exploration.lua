@@ -12,22 +12,73 @@ local ExplorationState = {
     encounter_rate = 80 -- steps before random encounter check
 }
 
-function ExplorationState.enter(map_name)
-    -- Default to sector 7 slums if no map provided
+function ExplorationState.enter(map_name, spawn_x, spawn_y, facing)
     local target_map = map_name or "sector_7_slums"
+    ExplorationState.current_map = target_map
     
     Tilemap.init()
     Tilemap.load(target_map)
     NPCManager.load_map_npcs(target_map)
-    Player.init(160, 224)
-    ExplorationState.step_counter = 0
     
-    -- Play exploration music (file stem only, loop it)
+    local px = spawn_x or 160
+    local py = spawn_y or 224
+    Player.init(px, py)
+    if facing then Player.facing = facing end
+    
+    ExplorationState.step_counter = 0
+    ExplorationState.is_transitioning = false
+    
     music.loop("theme")
 end
 
+function ExplorationState.trigger_edge_transition(direction)
+    local connections = {
+        sector_7_slums = { north = "sector_7_north", east = "sector_7_east" },
+        sector_7_north = { south = "sector_7_slums", north = "substation_07" },
+        sector_7_east = { west = "sector_7_slums" },
+        substation_07 = { south = "sector_7_north", north = "sector_4_streets" },
+        sector_4_streets = { south = "substation_07", north = "node_core_01" },
+        node_core_01 = { south = "sector_4_streets" }
+    }
+    local cmap = ExplorationState.current_map
+    local map_w = Tilemap.width * Tilemap.tile_size
+    local map_h = Tilemap.height * Tilemap.tile_size
+
+    if not connections[cmap] or not connections[cmap][direction] then
+        -- Block movement
+        if direction == "west" then Player.x = 0
+        elseif direction == "east" then Player.x = map_w - Player.w
+        elseif direction == "north" then Player.y = 0
+        elseif direction == "south" then Player.y = map_h - Player.h
+        end
+        return
+    end
+    
+    local next_map = connections[cmap][direction]
+    ExplorationState.is_transitioning = true
+    
+    Transition.start("fade_out", 3.0, function()
+        Tilemap.load(next_map)
+        local nmap_w = Tilemap.width * Tilemap.tile_size
+        local nmap_h = Tilemap.height * Tilemap.tile_size
+        
+        local nx, ny = Player.x, Player.y
+        if direction == "west" then nx = nmap_w - Player.w - 8
+        elseif direction == "east" then nx = 8
+        elseif direction == "north" then ny = nmap_h - Player.h - 8
+        elseif direction == "south" then ny = 8
+        end
+        
+        ExplorationState.current_map = next_map
+        NPCManager.load_map_npcs(next_map)
+        Player.x = nx
+        Player.y = ny
+        ExplorationState.is_transitioning = false
+        Transition.start("fade_in", 3.0)
+    end)
+end
+
 function ExplorationState.update(dt)
-    -- If menu or dialogue is active, update those instead
     if MenuScreen.active then
         MenuScreen.update(dt)
         return
@@ -36,16 +87,34 @@ function ExplorationState.update(dt)
         DialogueBox.update(dt)
         return
     end
+    if ExplorationState.is_transitioning then
+        return
+    end
 
     Player.update(dt)
     NPCManager.update(dt)
     
-    -- Check walk-over triggers
+    -- Check edge transitions
+    local map_w = Tilemap.width * Tilemap.tile_size
+    local map_h = Tilemap.height * Tilemap.tile_size
+    if Player.x < -4 then ExplorationState.trigger_edge_transition("west")
+    elseif Player.x > map_w - Player.w + 4 then ExplorationState.trigger_edge_transition("east")
+    elseif Player.y < -4 then ExplorationState.trigger_edge_transition("north")
+    elseif Player.y > map_h - Player.h + 4 then ExplorationState.trigger_edge_transition("south")
+    end
+    
+    if ExplorationState.is_transitioning then return end
+    
     local trigger = NPCManager.check_trigger(Player.x, Player.y, Player.w, Player.h)
     if trigger then
-        if not trigger.quest_step or (QuestTracker and QuestTracker.chapter == trigger.quest_step) then
+        if trigger.is_warp then
+            ExplorationState.is_transitioning = true
+            Transition.start("iris_out", 2.0, function()
+                ExplorationState.enter(trigger.target_map, trigger.target_x, trigger.target_y)
+                Transition.start("iris_in", 2.0)
+            end)
+        elseif not trigger.quest_step or (QuestTracker and QuestTracker.chapter == trigger.quest_step) then
             if trigger.run_once then trigger.active = false end
-            -- Load dialogue tree from JSON
             local dfile, dnode = trigger.dialogue_id:match("([^:]+):?([^:]*)")
             dnode = (dnode == "") and dfile or dnode
             if dfile and dfile ~= "" then

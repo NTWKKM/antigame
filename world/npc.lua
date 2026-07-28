@@ -54,7 +54,7 @@ function NPCManager.load_map_npcs(map_name)
     
     if Tilemap.objects then
         for _, obj in ipairs(Tilemap.objects) do
-            if obj.type == "npc" or obj.type == "trigger" then
+            if obj.type == "npc" or obj.type == "trigger" or obj.type == "warp" then
                 local sprite = 0
                 local dialogue_id = ""
                 if obj.properties then
@@ -65,7 +65,17 @@ function NPCManager.load_map_npcs(map_name)
                 local npc = NPC.new(obj.name, obj.name, obj.x, obj.y, sprite, dialogue_id)
                 npc.w = obj.width or 16
                 npc.h = obj.height or 16
-                npc.is_trigger = (obj.type == "trigger")
+                npc.is_trigger = (obj.type == "trigger" or obj.type == "warp")
+                
+                if obj.type == "warp" then
+                    npc.is_warp = true
+                    if obj.properties then
+                        npc.target_map = obj.properties.target_map
+                        npc.target_x = obj.properties.target_x or 16
+                        npc.target_y = obj.properties.target_y or 16
+                    end
+                end
+                
                 if obj.properties and obj.properties.run_once then
                     npc.run_once = true
                 end

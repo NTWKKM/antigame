@@ -74,7 +74,10 @@ function DialogueBox.execute_action(action, target)
             end
         end
     elseif action == "map_transition" then
-        State.swap("EXPLORATION", target)
+        local target_map, tx, ty = target:match("([^:]+):?(%d*):?(%d*)")
+        local px = tonumber(tx)
+        local py = tonumber(ty)
+        State.swap("EXPLORATION", target_map, px, py)
     end
 end
 
